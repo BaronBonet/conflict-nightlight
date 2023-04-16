@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package conflict_nightlight.v1;
+
+
+message DownloadAndCropRawTifRequest {
+  Map map = 1;
+}
+
+message CreateMapProductRequest {
+  Map map = 1;
+}
+
+message PublishMapProductRequest {
+  Map map = 1;
+}
+
+message Map {
+  Date date = 1;
+  MapType map_type = 2;
+  Bounds bounds = 3;
+  MapSource map_source = 4;
+}
+
+message Date {
+  int32 day = 1;
+  int32 month = 2;
+  int32 year = 3;
+}
+
+message MapSource {
+  MapProvider map_provider = 1;
+  string url = 2;
+}
+
+enum MapProvider {
+  MAP_PROVIDER_UNSPECIFIED = 0;
+  MAP_PROVIDER_EOGDATA = 1;
+}
+
+enum MapType {
+  MAP_TYPE_UNSPECIFIED = 0;
+  MAP_TYPE_DAILY = 1;
+  MAP_TYPE_MONTHLY = 2;
+}
+
+enum Bounds {
+  BOUNDS_UNSPECIFIED = 0;
+  BOUNDS_UKRAINE_AND_AROUND = 1;
+}
+
+message RequestWrapper {
+  oneof message {
+    DownloadAndCropRawTifRequest download_and_crop_raw_tif_request = 1;
+    CreateMapProductRequest create_map_product_request = 2;
+    PublishMapProductRequest publish_map_product_request = 3;
+  }
+}
+
+message MapOptions {
+  string display_name = 1;
+  string url = 2;
+  string key = 3;
+}
