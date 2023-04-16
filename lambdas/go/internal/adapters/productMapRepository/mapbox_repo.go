@@ -38,11 +38,10 @@ func NewMapboxRepo(ctx context.Context, logger ports.Logger, secretsKey string, 
 }
 
 func (repo *MapboxRepo) Publish(ctx context.Context, m domain.LocalMap) {
-	//tempCreds := repo.getMapboxTempCreds(ctx, repo.secrets.MapboxUsername, repo.secrets.MapboxPublicToken)
-	//repo.uploadToMapboxTempS3(ctx, m.Filepath, tempCreds)
+	tempCreds := repo.getMapboxTempCreds(ctx, repo.secrets.MapboxUsername, repo.secrets.MapboxPublicToken)
+	repo.uploadToMapboxTempS3(ctx, m.Filepath, tempCreds)
 	repo.logger.Debug(ctx, "Uploaded to mapbox's temp s3 succeeded, attempting to notify mapbox.")
-	//tileset := repo.uploadToMapbox(ctx, tempCreds, repo.secrets.MapboxPublicToken, repo.secrets.MapboxUsername, m.Map.String())
-	tileset := fmt.Sprintf("%s.%s", repo.secrets.MapboxUsername, m.Map.String())
+	tileset := repo.uploadToMapbox(ctx, tempCreds, repo.secrets.MapboxPublicToken, repo.secrets.MapboxUsername, m.Map.String())
 	repo.logger.Info(ctx, "Mapbox was updated with a new tileset, updating frontend.", "tilesetName", tileset)
 	repo.updateJSONForFrontend(ctx, m.Map, tileset)
 }
@@ -182,7 +181,6 @@ func getSecrets(ctx context.Context, logger ports.Logger, secretsKey string) sec
 }
 
 func (repo *MapboxRepo) getMapboxTempCreds(ctx context.Context, username string, token string) mapBoxTempCreds {
-	// Set up the HTTP request
 	url := fmt.Sprintf("https://api.mapbox.com/uploads/v1/%s/credentials?access_token=%s", username, token)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {

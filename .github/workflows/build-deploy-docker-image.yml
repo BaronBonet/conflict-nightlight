@@ -27,7 +27,7 @@ jobs:
 
       - name: set-docker-image-tag
         run: |
-          echo "DOCKER_IMAGE_TAG=${{ env.ECR_REGISTRY }}/${{ env.PROJECT_PREFIX }}-${{ env.FUNCTION_NAME 
+          echo "DOCKER_IMAGE_TAG=${{ env.ECR_REGISTRY }}/${{ env.PROJECT_PREFIX }}-${{ env.FUNCTION_NAME
           }}-repo:${{ inputs.image-tag }}" >> $GITHUB_ENV
           echo "DOCKER_IMAGE_TAG_LATEST=${{ env.ECR_REGISTRY }}/${{ env.PROJECT_PREFIX }}-${{ env
           .FUNCTION_NAME }}-repo:latest" >> $GITHUB_ENV
