@@ -1,0 +1,51 @@
+name: On push main
+
+on:
+  push:
+    branches:
+      - main
+
+
+# TODO inject variables to go and react, for the file shared with the CDN
+env:
+  FRONTEND_MAP_OPTIONS_JSON: "conflict-nightlight-map-options"
+
+jobs:
+  image-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.set-image-tag.outputs.image-tag }}
+    steps:
+      - id: set-image-tag
+        run: echo "image-tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+  go-zip-builder-and-deployer:
+    needs:
+      - image-tag
+    secrets: inherit
+    strategy:
+      matrix:
+        name: [ map_controller, map_publisher ]
+    uses: ./.github/workflows/build-deploy-go.yml
+    with:
+      name: ${{ matrix.name }}
+      zip-tag: ${{ needs.image-tag.outputs.image-tag }}
+      deploy: true
+
+  python-image-builder-and-deployer:
+    needs:
+      - image-tag
+    secrets: inherit
+    uses: ./.github/workflows/build-deploy-docker-image.yml
+    with:
+      deploy: true
+      image-tag: ${{ needs.image-tag.outputs.image-tag }}
+
+  react-image-builder-and-deployer:
+    needs:
+      - image-tag
+    secrets: inherit
+    uses: ./.github/workflows/build-deploy-react.yml
+    with:
+      deploy: true
+      version: ${{ needs.image-tag.outputs.image-tag }}

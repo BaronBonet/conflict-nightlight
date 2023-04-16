@@ -1,0 +1,78 @@
+name: Python lint, test build
+
+on:
+  workflow_call
+
+env:
+  PYTHON_VERSION: '3.10.6'
+  POETRY_VERSION: '1.2.1'
+  WORKING_DIR: lambdas/python
+
+jobs:
+  lint-test-python:
+    name: Lint and test Python
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install python
+        uses: actions/setup-python@v4
+        id: setup-python
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Load cached poetry
+        uses: actions/cache@v3
+        with:
+          path: ~/.local/
+          key: poetry-cache-${{ steps.setup-python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+
+      - name: Install poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+          virtualenvs-in-project: true
+
+      - name: Load cached virtualenv
+        id: cached-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles(format('{0}/poetry.lock', env.WORKING_DIR)) }}
+          restore-keys: |
+            venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root --sync
+
+      - name: Verify poetry dependencies
+        run: poetry lock --check
+
+      - name: Run black
+        working-directory: ${{ env.WORKING_DIR }}
+        run: poetry run black --config pyproject.toml --check .
+
+      - name: Run isort
+        uses: isort/isort-action@master
+        with:
+          configuration: --profile black
+
+      - name: install buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
+
+      - name: Generate python proto stubs
+        working-directory: .
+        run: make generate-python
+
+      - name: Run flake8
+        uses: py-actions/flake8@v2
+        with:
+          args: --config ${{ env.WORKING_DIR }}/.flake8
+
+      - name: Run pytest
+        run: poetry run pytest

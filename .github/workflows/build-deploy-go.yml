@@ -1,0 +1,73 @@
+name: Go zip builder and deployer
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        required: true
+        type: string
+      zip-tag:
+        required: false
+        default: undefined
+        type: string
+      deploy:
+        required: false
+        type: boolean
+        default: false
+
+env:
+  S3_BUCKET_NAME: conflict-nightlight-zip-deployables
+  WORKING_DIR: lambdas/go
+
+jobs:
+  build-go-zips-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: ${{ env.WORKING_DIR }}/go.mod
+          cache-dependency-path: ${{ env.WORKING_DIR }}/go.mod
+          cache: true
+
+      - run: go install golang.org/x/tools/cmd/stringer@latest
+
+      - name: install buf
+        uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
+
+      - name: build go app
+        working-directory: .
+        run: make build-go-aws APP=${{ inputs.name }}
+
+      - name: Replace underscores in name with hyphens
+        id: replace-underscore
+        run: echo "hyphen-name=$(echo ${{ inputs.name }} | tr _ - )" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS
+        if: ${{ inputs.deploy == true }}
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Push to S3
+        if: ${{ inputs.deploy == true }}
+        run: |
+          aws s3 cp out/${{ inputs.name }}/handler/main.zip \
+            s3://${{ env.S3_BUCKET_NAME }}/${{ steps.replace-underscore.outputs.hyphen-name }}/${{ inputs.zip-tag }}.zip
+          aws s3 cp s3://${{ env.S3_BUCKET_NAME }}/${{ steps.replace-underscore.outputs.hyphen-name }}/${{ inputs.zip-tag }}.zip \
+            s3://${{ env.S3_BUCKET_NAME }}/${{ steps.replace-underscore.outputs.hyphen-name }}/latest.zip
+
+      - name: Update lambda
+        if: ${{ inputs.deploy == true }}
+        run: |
+          aws lambda update-function-code --function-name conflict-nightlight-${{ steps.replace-underscore.outputs.hyphen-name }}-function \
+            --s3-bucket ${{ env.S3_BUCKET_NAME }} \
+            --s3-key ${{ steps.replace-underscore.outputs.hyphen-name }}/${{ inputs.zip-tag }}.zip
