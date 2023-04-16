@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package conflict_nightlight.v1;
 
-
 message DownloadAndCropRawTifRequest {
   Map map = 1;
 }

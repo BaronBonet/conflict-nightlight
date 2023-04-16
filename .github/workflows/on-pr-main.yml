@@ -1,0 +1,32 @@
+name: On pull request main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  python-lint-test:
+    uses: ./.github/workflows/lint-test-python.yml
+
+  python-image-builder:
+    needs: python-lint-test
+    uses: ./.github/workflows/build-deploy-docker-image.yml
+
+  go-lint-test:
+    uses: ./.github/workflows/lint-test-go.yml
+
+  go-builder:
+    needs: go-lint-test
+    strategy:
+      matrix:
+        name: [ map_controller, map_publisher ]
+    uses: ./.github/workflows/build-deploy-go.yml
+    with:
+      name: ${{ matrix.name }}
+
+  react-builder:
+    uses: ./.github/workflows/build-deploy-react.yml
+
+  proto-lint:
+    uses: ./.github/workflows/lint-proto.yml
