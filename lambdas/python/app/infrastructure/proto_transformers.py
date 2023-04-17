@@ -1,5 +1,7 @@
+import datetime
+
 from app.core import domain
-from generated.conflict_nightlight.v1 import Map, Date, MapProvider, MapType, Bounds
+from generated.conflict_nightlight.v1 import Map, Date, MapProvider, MapType, Bounds, MapSource
 
 
 def transform_map_domain_to_proto(m: domain.Map) -> Map:
@@ -14,21 +16,30 @@ def transform_map_domain_to_proto(m: domain.Map) -> Map:
 def map_provider_to_string(p: MapProvider) -> str | None:
     match p:
         case MapProvider.MAP_PROVIDER_EOGDATA:
-            return "Eogdata"
+            return "MapProviderEogdata"
     return None
 
 
 def map_type_to_string(t: MapType) -> str | None:
     match t:
         case MapType.MAP_TYPE_MONTHLY:
-            return "Monthly"
+            return "MapTypeMonthly"
         case MapType.MAP_TYPE_DAILY:
-            return "Daily"
+            return "MapTypeDaily"
     return None
 
 
 def bounds_to_string(b: Bounds) -> str | None:
     match b:
         case Bounds.BOUNDS_UKRAINE_AND_AROUND:
-            return "UkraineAndAround"
+            return "BoundsUkraineAndAround"
     return None
+
+
+def proto_map_to_domain(m: Map) -> domain.Map:
+    return domain.Map(
+        date=datetime.date(m.date.year, m.date.month, m.date.day),
+        map_type=MapType(m.map_type),
+        map_source=MapSource(map_provider=MapProvider(m.map_source.map_provider), url=m.map_source.url),
+        bounds=Bounds(m.bounds),
+    )

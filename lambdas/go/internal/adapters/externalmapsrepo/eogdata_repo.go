@@ -1,4 +1,4 @@
-package externalmapsrepository
+package externalmapsrepo
 
 import (
 	"context"
@@ -26,7 +26,7 @@ func NewEogdataExternalMapsRepository(logger ports.Logger, tmpWriteDir string) *
 }
 
 func (repo *EogdataRepo) GetProvider() domain.MapProvider {
-	return domain.Eogdata
+	return domain.MapProviderEogdata
 }
 
 func (repo *EogdataRepo) List(ctx context.Context, bounds domain.Bounds, mapType domain.MapType) ([]domain.Map, error) {
@@ -48,8 +48,7 @@ func (repo *EogdataRepo) List(ctx context.Context, bounds domain.Bounds, mapType
 		if isTgzLink(url) {
 			urls = append(urls, url)
 		} else {
-			err := repo.scraper.Visit(url)
-			if err != nil {
+			if err := repo.scraper.Visit(url); err != nil {
 				repo.logger.Error(ctx, "Error when trying to visit a URL", "error", err, "url", url)
 			}
 		}
@@ -58,8 +57,8 @@ func (repo *EogdataRepo) List(ctx context.Context, bounds domain.Bounds, mapType
 	if err != nil {
 		return nil, err
 	}
-	err = repo.scraper.Visit(*urlToScrape)
-	if err != nil {
+	if err := repo.scraper.Visit(*urlToScrape); err != nil {
+		repo.logger.Error(ctx, "Error when trying to visit a URL", "error", err, "url", *urlToScrape)
 		return nil, err
 	}
 
@@ -67,7 +66,7 @@ func (repo *EogdataRepo) List(ctx context.Context, bounds domain.Bounds, mapType
 	for _, url := range urls {
 		if getTileId(url) == tileId.String() &&
 			!strings.Contains(url, "vcmslcfg") {
-			date, err := extractDateFromLink(url)
+			date, err := extractDateFromMonthlyLink(url)
 			if err != nil {
 				return nil, err
 			}
@@ -76,7 +75,7 @@ func (repo *EogdataRepo) List(ctx context.Context, bounds domain.Bounds, mapType
 				MapType: mapType,
 				Bounds:  bounds,
 				Source: domain.MapSource{
-					MapProvider: domain.Eogdata,
+					MapProvider: domain.MapProviderEogdata,
 					URL:         url,
 				},
 			})
@@ -85,7 +84,7 @@ func (repo *EogdataRepo) List(ctx context.Context, bounds domain.Bounds, mapType
 	return sourceMaps, nil
 }
 
-// EogdataTileId denotes one of the 6 tiles that the Eogdata service uses
+// EogdataTileId denotes one of the 6 tiles that the MapProviderEogdata service uses
 // our bounding shape file needs to be mapped to the tile that it is apart of.
 type EogdataTileId string
 
@@ -100,7 +99,7 @@ func (id EogdataTileId) String() string {
 func boundsToTileID(bounds domain.Bounds) (*EogdataTileId, error) {
 	var tileId EogdataTileId
 	switch bounds {
-	case domain.UkraineAndAround:
+	case domain.BoundsUkraineAndAround:
 		tileId = EOGDATATILEID_TILE2
 	default:
 		return nil, fmt.Errorf("unknown Bounds: %s", bounds)
@@ -111,9 +110,9 @@ func boundsToTileID(bounds domain.Bounds) (*EogdataTileId, error) {
 func mapTypeToUrl(mapType domain.MapType) (*string, error) {
 	var urlToScrape string
 	switch mapType {
-	case domain.Daily:
+	case domain.MapTypeDaily:
 		urlToScrape = "https://eogdata.mines.edu/nighttime_light/nightly/rade9d/"
-	case domain.Monthly:
+	case domain.MapTypeMonthly:
 		urlToScrape = "https://eogdata.mines.edu/nighttime_light/monthly/v10/"
 	default:
 		return nil, errors.New("unknown map type")
@@ -121,7 +120,7 @@ func mapTypeToUrl(mapType domain.MapType) (*string, error) {
 	return &urlToScrape, nil
 }
 
-func extractDateFromLink(link string) (*domain.Date, error) {
+func extractDateFromMonthlyLink(link string) (*domain.Date, error) {
 	segments := strings.Split(link, "/")
 	year, err := strconv.ParseInt(segments[6], 10, 32)
 	if err != nil {
@@ -134,6 +133,7 @@ func extractDateFromLink(link string) (*domain.Date, error) {
 	return &domain.Date{
 		Year:  int(year),
 		Month: int(month),
+		Day:   1,
 	}, nil
 }
 

@@ -1,11 +1,11 @@
 import logging.config
 import logging
-import sys
 
 import structlog
 from structlog import get_logger
 from inspect import currentframe, getframeinfo
 
+from app.core.domain import KillProcess
 from app.core.ports import Logger
 
 
@@ -49,10 +49,12 @@ class StructLogger(Logger):
                 structlog.processors.JSONRenderer(),
             ],
         )
+        logger = logging.getLogger()
+        # Remove any preconfigured handlers
+        for h in logger.handlers:
+            logger.removeHandler(h)
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
-
-        logger = logging.getLogger()
         logger.addHandler(handler)
         logger.setLevel(log_level)
         for source in noisy_logs:
@@ -74,4 +76,4 @@ class StructLogger(Logger):
 
     def fatal(self, msg: str, **kwargs):
         self.logger.error(msg, **kwargs)
-        sys.exit(msg)
+        raise KillProcess(msg)

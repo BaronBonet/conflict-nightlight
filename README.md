@@ -2,6 +2,7 @@
 
 A full stack application for downloading, processing and displaying nightlight data.
 
+
 ## About
 
 The primary purpose of this project is to showcase the effects of nightlight output due to the war in

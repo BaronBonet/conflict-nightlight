@@ -23,12 +23,20 @@ jobs:
           cache-dependency-path: ${{ env.WORKING_DIR }}/go.mod
           cache: true
 
+      - run: |
+          mkdir -p "$PWD/bin"
+          echo "$PWD/bin" >> $GITHUB_PATH
+
       - run: go install golang.org/x/tools/cmd/stringer@latest
 
       - name: install buf
         uses: bufbuild/buf-setup-action@v1
         with:
           github_token: ${{ github.token }}
+
+      - name: install mockery
+        run: |
+          tar -xz -C bin -f <(curl -Ls https://github.com/vektra/mockery/releases/download/v2.25.0/mockery_2.25.0_Linux_x86_64.tar.gz)
 
       - name: generate proto stubs
         working-directory: .

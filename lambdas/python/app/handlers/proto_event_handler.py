@@ -9,6 +9,7 @@ from app.core import ports
 from app.core.services.product import MapProductService
 from app.core.services.raw_processor import RawMapProcessorService
 from app.infrastructure.get_secrets_from_aws_secret_manager import get_secrets_from_aws_secrets_manager
+from app.infrastructure.proto_transformers import proto_map_to_domain
 from generated.conflict_nightlight.v1 import (
     DownloadAndCropRawTifRequest,
     CreateMapProductRequest,
@@ -34,7 +35,6 @@ def handle_event(event: dict[str, str], correlation_id: str):
         download_and_crop_raw_tif_request(logger, request, correlation_id, write_dir)
 
     elif is_used(request.create_map_product_request):
-        logger.debug("Configuring service to handle a new raw tif file request", request=event)
         create_new_map_product_request(
             logger=logger, request=request, correlation_id=correlation_id, write_dir=write_dir
         )
@@ -46,6 +46,11 @@ def create_new_map_product_request(
     logger: ports.Logger, request: RequestWrapper, correlation_id: str, write_dir: pathlib.Path
 ):
     logger.debug("Configuring service to handle new map product request", request=request.to_json())
+    message_notification_queue = NewMessageNotificationQueue(
+        queue_name=os.getenv("PUBLISH_MAP_PRODUCT_REQUEST_QUEUE", "conflict-nightlight-publish-map-product-request"),
+        message_format=PublishMapProductRequest,
+    )
+    message_notification_queue.validate()
     service = MapProductService(
         raw_map_repository=S3InternalMapRepository(
             bucket_name=os.getenv("RAW_TIF_BUCKET", "conflict-nightlight-raw-tif"),
@@ -58,22 +63,22 @@ def create_new_map_product_request(
             logger=logger,
             bucket_name=os.getenv("PROCESSED_TIF_BUCKET_NAME", "conflict-nightlight-processed-tif"),
             correlation_id=correlation_id,
-            new_message_notification=NewMessageNotificationQueue(
-                queue_name=os.getenv(
-                    "PUBLISH_MAP_PRODUCT_REQUEST_QUEUE", "conflict-nightlight-publish-map-product-request"
-                ),
-                message_format=PublishMapProductRequest,
-            ),
+            new_message_notification=message_notification_queue,
             local_write_dir=write_dir,
         ),
     )
-    service.process_save(request.create_map_product_request.map)
+    service.process_save(proto_map_to_domain(request.create_map_product_request.map))
 
 
 def download_and_crop_raw_tif_request(
     logger: ports.Logger, request: RequestWrapper, correlation_id: str, write_dir: pathlib.Path
 ):
     logger.debug("Configuring service to handle a download raw tif request", request=request.to_json())
+    message_notification_queue = NewMessageNotificationQueue(
+        queue_name=os.getenv("CREATE_MAP_PRODUCT_REQUEST_QUEUE", "conflict-nightlight-create-map-product-request"),
+        message_format=CreateMapProductRequest,
+    )
+    message_notification_queue.validate()
     service = RawMapProcessorService(
         logger=logger,
         external_map_repository=EogdataMapRepository(
@@ -85,12 +90,7 @@ def download_and_crop_raw_tif_request(
         ),
         internal_map_repository=S3InternalMapRepository(
             logger=logger,
-            new_message_notification=NewMessageNotificationQueue(
-                queue_name=os.getenv(
-                    "CREATE_MAP_PRODUCT_REQUEST_QUEUE", "conflict-nightlight-create-map-product-request"
-                ),
-                message_format=CreateMapProductRequest,
-            ),
+            new_message_notification=message_notification_queue,
             bucket_name=os.getenv("RAW_TIF_BUCKET", "conflict-nightlight-raw-tif"),
             correlation_id=correlation_id,
             local_write_dir=write_dir,
@@ -101,4 +101,6 @@ def download_and_crop_raw_tif_request(
             logger=logger,
         ),
     )
-    service.download_crop_save(m=request.download_and_crop_raw_tif_request.map)
+    m = proto_map_to_domain(request.download_and_crop_raw_tif_request.map)
+    logger.debug("Converted proto map to domain map", map=m)
+    service.download_crop_save(m)

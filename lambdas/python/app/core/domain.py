@@ -16,3 +16,7 @@ class Map:
 class LocalMap:
     map: Map
     file_path: pathlib.Path
+
+
+class KillProcess(Exception):
+    pass

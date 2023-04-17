@@ -1,10 +1,10 @@
-package externalmapsrepository
+package externalmapsrepo
 
 import (
 	"testing"
 )
 
-func TestGetTileId(t *testing.T) {
+func TestEogdataRepo_GetTileId(t *testing.T) {
 	testCases := []struct {
 		link     string
 		expected string

@@ -10,9 +10,9 @@ import (
 func TestDomainToDownloadAndCropTifRequest(t *testing.T) {
 	m := domain.Map{
 		Date:    domain.Date{Month: 1, Year: 2022},
-		MapType: domain.Daily,
-		Bounds:  domain.UkraineAndAround,
-		Source:  domain.MapSource{URL: "http://example.com", MapProvider: domain.Eogdata},
+		MapType: domain.MapTypeDaily,
+		Bounds:  domain.BoundsUkraineAndAround,
+		Source:  domain.MapSource{URL: "http://example.com", MapProvider: domain.MapProviderEogdata},
 	}
 	p := DomainToProto(m)
 	assert.Equal(t, p.MapType.String(), "MAP_TYPE_DAILY")
@@ -23,7 +23,8 @@ func TestDomainToDownloadAndCropTifRequest(t *testing.T) {
 }
 
 func TestToSnakeCase(t *testing.T) {
-	assert.Equal(t, ToSnakeCase("helloWorld"), "hello_world")
+	assert.Equal(t, CamelToSnakeCase("helloWorld"), "hello_world")
+	assert.Equal(t, CamelToSnakeCase("helloFullWorld"), "hello_full_world")
 }
 
 func TestProtoToDomain(t *testing.T) {
@@ -41,12 +42,12 @@ func TestProtoToDomain(t *testing.T) {
 		},
 	}
 	m := ProtoToDomain(&p)
-	assert.Equal(t, m.Bounds.String(), "UkraineAndAround")
+	assert.Equal(t, m.Bounds.String(), "BoundsUkraineAndAround")
 	assert.Equal(t, m.Source.URL, "example.com")
-	assert.Equal(t, m.Source.MapProvider.String(), "Eogdata")
+	assert.Equal(t, m.Source.MapProvider.String(), "MapProviderEogdata")
 	assert.Equal(t, m.Date.Day, 0)
 	assert.Equal(t, m.Date.Month, 1)
 	assert.Equal(t, m.Date.Year, 2023)
-	assert.Equal(t, m.MapType.String(), "Daily")
+	assert.Equal(t, m.MapType.String(), "MapTypeDaily")
 
 }

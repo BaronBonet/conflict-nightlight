@@ -60,4 +60,12 @@ message MapOptions {
   string display_name = 1;
   string url = 2;
   string key = 3;
+  Map map = 4;
+}
+
+message SyncMapRequest {
+  Bounds bounds = 1;
+  MapType map_type = 2;
+  repeated int32 selected_months = 3;
+  repeated int32 selected_years = 4;
 }
