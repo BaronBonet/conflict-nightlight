@@ -54,7 +54,11 @@ class S3InternalMapRepository(InternalMapRepository):
 
     def download(self, m: domain.Map) -> domain.LocalMap:
         self.logger.info("Downloading map from s3", bucket_name=self.bucket_name, map=m)
-        return domain.LocalMap(map=m, file_path=self._download_file(self._construct_key(m)))
+        try:
+            key = construct_key(m)
+        except ErrorConstructKey as e:
+            self.logger.fatal(str(e))
+        return domain.LocalMap(map=m, file_path=self._download_file(key))
 
     def save(self, m: domain.LocalMap):
         self.logger.info("Attempting to save map to s3", bucket_name=self.bucket_name, map=m)
@@ -66,9 +70,11 @@ class S3InternalMapRepository(InternalMapRepository):
             self.s3_client.upload_file(
                 Filename=str(m.file_path),
                 Bucket=self.bucket_name,
-                Key=self._construct_key(m.map),
+                Key=construct_key(m.map),
                 ExtraArgs={"Metadata": {self.source_url_key: m.map.map_source.url}},
             )
+        except ErrorConstructKey as e:
+            self.logger.fatal(str(e))
         except Exception as e:
             self.logger.fatal("Error when trying to upload map", map=m, bucket=self.bucket_name, error=e)
         self._send_sqs_message(m.map)
@@ -76,13 +82,14 @@ class S3InternalMapRepository(InternalMapRepository):
     def _download_file(self, object_key: str) -> pathlib.Path:
         self.local_write_dir.mkdir(parents=True, exist_ok=True)
         local_name = self.local_write_dir / "temp.tif"
-
         try:
             self.s3_client.download_file(self.bucket_name, object_key, local_name)
         except ClientError as e:
             self.logger.fatal(
                 "Error while trying to download a file from s3", bucket_name=self.bucket_name, key=object_key, error=e
             )
+        except Exception as e:
+            self.logger.fatal("Error while trying to download file from s3", error=e)
         return local_name
 
     def _send_sqs_message(self, m: domain.Map):
@@ -116,28 +123,17 @@ class S3InternalMapRepository(InternalMapRepository):
             case _:
                 self.logger.fatal("Unknown message format", message_format=self.new_message_notification.message_format)
 
-    def _construct_key(self, m: domain.Map) -> str:
-        provider = map_provider_to_string(m.map_source.map_provider)
-        map_type = map_type_to_string(m.map_type)
-        bounds = bounds_to_string(m.bounds)
-        if not provider or not map_type or not bounds:
-            self.logger.fatal("The key could not be constructed", provider=provider, map_type=map_type, bounds=bounds)
-        return f"{provider}/{bounds}/{map_type}/{m.date.year}_{m.date.month}_{m.date.day}.tif"
 
-    def _extract_metadata(self, object_key) -> Optional[str]:
-        """
-        Currently not used but could be useful if we want to list and return Map objects
-        """
-        try:
-            head_object = self.s3_client.head_object(Bucket=self.bucket_name, Key=object_key)
-        except ClientError as e:
-            self.logger.fatal(
-                "Error while trying to fetch the head object from the S3 object",
-                object_key=object_key,
-                bucket=self.bucket_name,
-                error=e,
-            )
-        md = head_object.download("Metadata")
-        if not md:
-            self.logger.fatal("Metadata was not found in the head_object", head_object=head_object)
-        return md.download(self.source_url_key)
+class ErrorConstructKey(Exception):
+    pass
+
+
+def construct_key(m: domain.Map) -> str:
+    provider = map_provider_to_string(m.map_source.map_provider)
+    map_type = map_type_to_string(m.map_type)
+    bounds = bounds_to_string(m.bounds)
+    if not provider or not map_type or not bounds:
+        raise ErrorConstructKey(
+            f"The key could not be constructed, provider={provider}, map_type={map_type}, bounds={bounds}"
+        )
+    return f"{provider}/{bounds}/{map_type}/{m.date.year}_{m.date.month}_{m.date.day}.tif"

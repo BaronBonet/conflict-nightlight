@@ -15,7 +15,7 @@ from generated.conflict_nightlight.v1 import (
 example_message_download_and_crop = RequestWrapper(
     download_and_crop_raw_tif_request=DownloadAndCropRawTifRequest(
         map=Map(
-            date=Date(month=1, year=2021),
+            date=Date(month=1, year=2021, day=1),
             map_type=MapType.MAP_TYPE_MONTHLY,
             map_source=MapSource(
                 map_provider=MapProvider.MAP_PROVIDER_EOGDATA,
@@ -32,7 +32,7 @@ example_message_download_and_crop = RequestWrapper(
 example_message_create_new_product = RequestWrapper(
     create_map_product_request=CreateMapProductRequest(
         map=Map(
-            date=Date(month=1, year=2021),
+            date=Date(month=1, year=2021, day=1),
             map_type=MapType.MAP_TYPE_MONTHLY,
             map_source=MapSource(
                 map_provider=MapProvider.MAP_PROVIDER_EOGDATA,
@@ -52,10 +52,10 @@ event = (
         {
           "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
           "receiptHandle": "MessageReceiptHandle",
-          "body": """
+          "body":"""
     + example_message_create_new_product.to_json()
-    + """,
-    "attributes": {
+    + """
+    , "attributes": {
         "ApproximateReceiveCount": "1",
         "SentTimestamp": "1679738941300",
         "SenderId": "AROAQNEQMQH5SQYGSWSE6:conflict-nightlight-map-controller-function",

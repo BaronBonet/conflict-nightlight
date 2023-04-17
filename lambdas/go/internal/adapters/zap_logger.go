@@ -16,11 +16,10 @@ func NewZapLogger(config zap.Config, useDebug bool) ports.Logger {
 
 	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	log, err := config.Build(zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
-
-	log = log.WithOptions(zap.AddCallerSkip(2))
 	if err != nil {
 		panic("Cannot create logger: " + err.Error())
 	}
+	log = log.WithOptions(zap.AddCallerSkip(2))
 
 	if useDebug {
 		config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
@@ -37,6 +36,10 @@ func (l *zapLogger) Debug(ctx context.Context, msg string, keysAndValues ...inte
 
 func (l *zapLogger) Info(ctx context.Context, msg string, keysAndValues ...interface{}) {
 	l.log(ctx, zap.InfoLevel, msg, keysAndValues...)
+}
+
+func (l *zapLogger) Warn(ctx context.Context, msg string, keysAndValues ...interface{}) {
+	l.log(ctx, zap.WarnLevel, msg, keysAndValues...)
 }
 
 func (l *zapLogger) Error(ctx context.Context, msg string, keysAndValues ...interface{}) {

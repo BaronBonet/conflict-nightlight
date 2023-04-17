@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"context"
+	"errors"
 	"github.com/google/uuid"
 )
 
@@ -19,6 +20,9 @@ func ExtractCorrelationIDFromContext(ctx context.Context) string {
 	return correlationId
 }
 
-func AddCorrelationIdToContext(ctx context.Context, correlationId *string) context.Context {
-	return context.WithValue(ctx, CorrelationIDKey, &correlationId)
+func AddCorrelationIdToContext(ctx context.Context, correlationId *string) (context.Context, error) {
+	if correlationId == nil {
+		return ctx, errors.New("correlationId is nil")
+	}
+	return context.WithValue(ctx, CorrelationIDKey, *correlationId), nil
 }

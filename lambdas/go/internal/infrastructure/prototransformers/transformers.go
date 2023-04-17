@@ -15,10 +15,10 @@ func DomainToProto(m domain.Map) conflict_nightlightv1.Map {
 			Month: int32(m.Date.Month),
 			Year:  int32(m.Date.Year),
 		},
-		MapType: conflict_nightlightv1.MapType(conflict_nightlightv1.MapType_value[fmt.Sprintf("MAP_TYPE_%s", strings.ToUpper(m.MapType.String()))]),
-		Bounds:  conflict_nightlightv1.Bounds(conflict_nightlightv1.Bounds_value[fmt.Sprintf("BOUNDS_%s", strings.ToUpper(ToSnakeCase(m.Bounds.String())))]),
+		MapType: conflict_nightlightv1.MapType(conflict_nightlightv1.MapType_value[fmt.Sprintf(strings.ToUpper(CamelToSnakeCase(m.MapType.String())))]),
+		Bounds:  conflict_nightlightv1.Bounds(conflict_nightlightv1.Bounds_value[fmt.Sprintf(strings.ToUpper(CamelToSnakeCase(m.Bounds.String())))]),
 		MapSource: &conflict_nightlightv1.MapSource{
-			MapProvider: conflict_nightlightv1.MapProvider(conflict_nightlightv1.MapProvider_value[fmt.Sprintf("MAP_PROVIDER_%s", strings.ToUpper(m.Source.MapProvider.String()))]),
+			MapProvider: conflict_nightlightv1.MapProvider(conflict_nightlightv1.MapProvider_value[fmt.Sprintf(strings.ToUpper(CamelToSnakeCase(m.Source.MapProvider.String())))]),
 			Url:         m.Source.URL,
 		},
 	}
@@ -33,11 +33,9 @@ func ProtoToDomain(mp *conflict_nightlightv1.Map) domain.Map {
 	}
 }
 
-var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
 var matchAllCap = regexp.MustCompile("([a-z0-9])([A-Z])")
 
-func ToSnakeCase(str string) string {
-	snake := matchFirstCap.ReplaceAllString(str, "${1}_${2}")
-	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
+func CamelToSnakeCase(str string) string {
+	snake := matchAllCap.ReplaceAllString(str, "${1}_${2}")
 	return strings.ToLower(snake)
 }

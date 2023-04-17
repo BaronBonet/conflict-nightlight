@@ -3,6 +3,7 @@ package domain
 import (
 	"fmt"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure"
+	"strings"
 )
 
 type Map struct {
@@ -13,12 +14,19 @@ type Map struct {
 }
 
 func (m *Map) String() string {
-	return fmt.Sprintf("%s-%s_%d-%d-%d", m.MapType.String(), m.Bounds.String()[:10], m.Date.Year, m.Date.Month, m.Date.Day)
+	mapTypeString := strings.Replace(m.MapType.String(), "MapType", "", 1)
+	boundsString := strings.Replace(m.Bounds.String(), "Bounds", "", 1)
+	return fmt.Sprintf("%s-%s_%d-%d-%d", mapTypeString, boundsString[:10], m.Date.Year, m.Date.Month, m.Date.Day)
 }
 
 type LocalMap struct {
 	Filepath string
 	Map      Map
+}
+
+type PublishedMap struct {
+	Map Map
+	Url string
 }
 
 type MapSource struct {
@@ -37,20 +45,29 @@ type MapProvider int
 
 const (
 	MapProviderUnspecified MapProvider = iota
-	Eogdata
+	MapProviderEogdata
 )
+
+func StringToMapProvider(s string) MapProvider {
+	for i := MapProviderUnspecified; i <= MapProviderEogdata; i++ {
+		if infrastructure.CleanStrings(i.String()) == infrastructure.CleanStrings(s) {
+			return i
+		}
+	}
+	return MapProviderUnspecified
+}
 
 //go:generate stringer -type=MapType
 type MapType int
 
 const (
 	MapTypeUnspecified MapType = iota
-	Daily
-	Monthly
+	MapTypeDaily
+	MapTypeMonthly
 )
 
 func StringToMapType(s string) MapType {
-	for i := MapTypeUnspecified; i <= Monthly; i++ {
+	for i := MapTypeUnspecified; i <= MapTypeMonthly; i++ {
 		if infrastructure.CleanStrings(i.String()) == infrastructure.CleanStrings(s) {
 			return i
 		}
@@ -62,18 +79,18 @@ func StringToMapType(s string) MapType {
 //
 //	this is implemented via a shp file, to prevent the specific implementation of
 //	geodata from bleeding into our domain you'll need to map the shape file name to the tile id
-//	in the service
+//	in the externalmapsrepo
 //
 //go:generate stringer -type=Bounds
 type Bounds int
 
 const (
 	BoundsUnspecified Bounds = iota
-	UkraineAndAround
+	BoundsUkraineAndAround
 )
 
 func StringToBounds(s string) Bounds {
-	for i := BoundsUnspecified; i <= UkraineAndAround; i++ {
+	for i := BoundsUnspecified; i <= BoundsUkraineAndAround; i++ {
 		if infrastructure.CleanStrings(i.String()) == infrastructure.CleanStrings(s) {
 			return i
 		}

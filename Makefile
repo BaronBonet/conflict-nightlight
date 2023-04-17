@@ -15,6 +15,17 @@ generate-proto-%:
 	@buf generate --template "proto/buf.gen.$*.yaml"
 
 
+.PHONY: build-cli
+build-cli: generate-go
+	@echo "Building CLI version ${VERSION}"
+	@cd ./lambdas/go/ \
+		go get ./... && \
+		go build -ldflags "-X 'github.com/BaronBonet/conflict-nightlight/internal/infrastructure.Version=${VERSION}'" \
+		-o ${OUT_DIR}/map-controller cmd/cli/*go
+	@mv ./lambdas/go/${OUT_DIR}/map-controller .
+	@chmod +x map-controller
+	@echo "Done building CLI."
+
 .PHONY: build-go-aws
 build-go-aws: guard-APP generate-go
 	@echo "Building $(APP) for AWS version ${VERSION}"
@@ -38,3 +49,7 @@ generate-python:
 	@rm -rf lambdas/python/generated
 	@$(MAKE) generate-proto-python
 	@echo "Done generating python"
+
+.PHONY: test
+test:
+	@cd lambdas/go/ && go test ./...
