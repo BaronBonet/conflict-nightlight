@@ -20,7 +20,7 @@ const nightlightOverview = {
     }
 };
 
-const maxMapBounds = [[22.0, 44.3], [40.3, 52.4]]
+const maxMapBounds = [[21.0, 43.3], [41.3, 54.0]]
 
 const getMapWidth = (width) => {
     if (width > 600) {
@@ -64,7 +64,7 @@ export const TheMap = ({selectedMap, mapSide, activeMap, setViewState, setActive
                 mapStyle="mapbox://styles/ericcbonet/cldc06jgu002j01nyu5qeclku"
                 mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
                 maxZoom={8}
-                minZoom={6}
+                minZoom={4}
                 onMove={activeMap === mapSide && onMove}
                 onMoveStart={onMoveStart}
                 maxBounds={maxMapBounds}

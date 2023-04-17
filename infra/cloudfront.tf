@@ -15,7 +15,6 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.frontend_s3_distribution.cloudfront_access_identity_path
     }
-
   }
 
   enabled             = true
