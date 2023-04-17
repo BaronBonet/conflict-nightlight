@@ -61,12 +61,6 @@ resource "aws_acm_certificate" "conflictnightlight_cdn" {
   }
 }
 
-#data "aws_route53_zone" "conflictnightlight_cdn" {
-#  name         = "cdn.${var.domain_name}"
-#  private_zone = false
-#}
-
-
 resource "aws_route53_record" "conflictnightlight_cdn" {
   for_each = {
     for dvo in aws_acm_certificate.conflictnightlight_cdn.domain_validation_options : dvo.domain_name => {

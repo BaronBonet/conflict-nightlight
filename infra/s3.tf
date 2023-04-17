@@ -234,14 +234,6 @@ resource "aws_s3_bucket_policy" "cdn_bucket_policy" {
   policy     = data.aws_iam_policy_document.cdn_bucket_policy_document.json
 }
 
-#resource "aws_s3_bucket_public_access_block" "cdn_bucket_block_public_access" {
-#  bucket                  = aws_s3_bucket.cdn.id
-#  block_public_acls       = true
-#  block_public_policy     = true
-#  ignore_public_acls      = true
-#  restrict_public_buckets = true
-#}
-
 resource "aws_s3_bucket_cors_configuration" "cdn_cors" {
   bucket = aws_s3_bucket.cdn.bucket
 
