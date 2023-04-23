@@ -5,6 +5,7 @@ import { TheMap } from './components/TheMap';
 import {CircularProgress, Grid} from '@mui/material';
 import ColorLegend from './components/ColorLegend'
 import * as d3 from 'd3';
+import FullScreenToggle from "./components/FullScreenToggle";
 
 console.log(`version ${process.env.REACT_APP_VERSION}`);
 
@@ -12,7 +13,7 @@ function App() {
     const [viewState, setViewState] = useState({
         latitude: 48.5,
         longitude: 31.4,
-        zoom: 5.3,
+        zoom: 5.4,
     });
 
     const [activeMap, setActiveMap] = useState('left');
@@ -79,6 +80,7 @@ function App() {
                     />
                 </Grid>
             </Grid>
+            <FullScreenToggle />
             <ColorLegend colorScale={colorScale} title="Light Intensity" ticks={5}/>
         </div>
     );

@@ -12,15 +12,15 @@ export default function YearMonthSelect({mapOptions, selectedMap, setMap}) {
 
     return (
         <div className='year-month-select-div'>
-                    <FormControl className='year-month-select'  sx={{m: 1, minWidth: 120}}>
-                        <Select
-                            value={selectedMap}
-                            onChange={handleChange}
-                            autoWidth
-                        >
-                            {mapOptions.map((object, i) => <MenuItem value={object} key={i}>{object.display_name}</MenuItem>)}
-                        </Select>
-                    </FormControl>
+        <FormControl className='year-month-select'  sx={{m: 1, minWidth: 120}} size="small">
+            <Select
+                value={selectedMap}
+                onChange={handleChange}
+                autoWidth
+            >
+                {mapOptions.map((object, i) => <MenuItem value={object} key={i}>{object.display_name}</MenuItem>)}
+            </Select>
+        </FormControl>
         </div>
     );
 }
