@@ -41,8 +41,8 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
   rule = aws_cloudwatch_event_rule.map_controller_schedule.name
   arn  = aws_lambda_function.conflict_nightlight_map_controller_lambda_function.arn
   input = jsonencode({
-    "bounds" : "bounds_ukraine_and_around",
-    "mapType" : "map_type_monthly",
+    "bounds" : "BOUNDS_UKRAINE_AND_AROUND",
+    "mapType" : "MAP_TYPE_MONTHLY",
     "selectedMonths" : [
       1,
       2,

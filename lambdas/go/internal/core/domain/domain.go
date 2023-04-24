@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure"
 	"strings"
+	"time"
 )
 
 type Map struct {
@@ -36,7 +37,7 @@ type MapSource struct {
 
 type Date struct {
 	Day   int
-	Month int
+	Month time.Month
 	Year  int
 }
 
@@ -99,6 +100,12 @@ func StringToBounds(s string) Bounds {
 }
 
 type SelectedDates struct {
-	Months []int `validate:"required,dive,gt=0,lte=12"`
-	Years  []int `validate:"required,dive,gt=2010"`
+	Months []time.Month
+	Years  []int
+}
+
+type SyncMapRequest struct {
+	Bounds        Bounds
+	MapType       MapType
+	SelectedDates SelectedDates
 }
