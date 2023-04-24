@@ -5,6 +5,7 @@ import (
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 	"github.com/go-playground/assert/v2"
 	"testing"
+	"time"
 )
 
 func TestDomainToDownloadAndCropTifRequest(t *testing.T) {
@@ -23,8 +24,8 @@ func TestDomainToDownloadAndCropTifRequest(t *testing.T) {
 }
 
 func TestToSnakeCase(t *testing.T) {
-	assert.Equal(t, CamelToSnakeCase("helloWorld"), "hello_world")
-	assert.Equal(t, CamelToSnakeCase("helloFullWorld"), "hello_full_world")
+	assert.Equal(t, camelToSnakeCase("helloWorld"), "hello_world")
+	assert.Equal(t, camelToSnakeCase("helloFullWorld"), "hello_full_world")
 }
 
 func TestProtoToDomain(t *testing.T) {
@@ -46,8 +47,31 @@ func TestProtoToDomain(t *testing.T) {
 	assert.Equal(t, m.Source.URL, "example.com")
 	assert.Equal(t, m.Source.MapProvider.String(), "MapProviderEogdata")
 	assert.Equal(t, m.Date.Day, 0)
-	assert.Equal(t, m.Date.Month, 1)
+	assert.Equal(t, m.Date.Month, time.Month(1))
 	assert.Equal(t, m.Date.Year, 2023)
 	assert.Equal(t, m.MapType.String(), "MapTypeDaily")
+}
 
+func TestProtoToSyncMapsRequest(t *testing.T) {
+	t.Run("Conversion from protobuf to domain struct", func(t *testing.T) {
+		protoReq := &conflict_nightlightv1.SyncMapRequest{
+			Bounds:         conflict_nightlightv1.Bounds_BOUNDS_UKRAINE_AND_AROUND,
+			MapType:        conflict_nightlightv1.MapType_MAP_TYPE_DAILY,
+			SelectedMonths: []int32{2, 3},
+			SelectedYears:  []int32{2022, 2023},
+		}
+
+		expectedDomainReq := domain.SyncMapRequest{
+			SelectedDates: domain.SelectedDates{
+				Years:  []int{2022, 2023},
+				Months: []time.Month{time.February, time.March},
+			},
+			MapType: domain.MapTypeDaily,
+			Bounds:  domain.BoundsUkraineAndAround,
+		}
+
+		domainReq := ProtoToSyncMapsRequest(protoReq)
+
+		assert.Equal(t, domainReq, expectedDomainReq)
+	})
 }

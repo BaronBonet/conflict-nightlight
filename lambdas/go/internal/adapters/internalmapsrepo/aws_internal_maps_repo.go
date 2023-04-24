@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 type AWSMapsRepo struct {
@@ -147,7 +148,7 @@ func extractDateFromKey(filePath string) (*domain.Date, error) {
 	}
 	return &domain.Date{
 		Day:   day,
-		Month: month,
+		Month: time.Month(month),
 		Year:  year,
 	}, nil
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/exp/slices"
+	"time"
 )
 
 type OrchestratorService struct {
@@ -29,9 +30,9 @@ func NewOrchestratorService(logger ports.Logger, externalMapsRepo ports.External
 	}
 }
 
-// SyncInternalWithExternal syncs the maps from the external map repo with the maps we have in the internal map repo
-func (srv *OrchestratorService) SyncInternalWithExternal(ctx context.Context, bounds domain.Bounds, mapType domain.MapType, selectedDates domain.SelectedDates) (*int, error) {
-	newMaps, err := srv.findNewMaps(ctx, bounds, mapType, selectedDates)
+// SyncInternalWithExternalMaps syncs the maps from the external map repo with the maps we have in the internal map repo
+func (srv *OrchestratorService) SyncInternalWithExternalMaps(ctx context.Context, request domain.SyncMapRequest) (*int, error) {
+	newMaps, err := srv.findNewMaps(ctx, request.Bounds, request.MapType, request.SelectedDates)
 	if err != nil {
 		srv.logger.Error(ctx, "Error when finding new maps", "error", err)
 		return nil, err
@@ -129,7 +130,7 @@ func (srv *OrchestratorService) findNewMaps(ctx context.Context, cropper domain.
 
 	var newMaps []domain.Map
 	for _, sourceMap := range sourceMaps {
-		if slices.Contains(selectedDates.Months, sourceMap.Date.Month) && slices.Contains(selectedDates.Years, sourceMap.Date.Year) && !slices.Contains(internalMaps, sourceMap) {
+		if slices.Contains(selectedDates.Months, time.Month(sourceMap.Date.Month)) && slices.Contains(selectedDates.Years, sourceMap.Date.Year) && !slices.Contains(internalMaps, sourceMap) {
 			srv.logger.Debug(ctx, "Found a map we do not have in our internal repo", "sourceMap", sourceMap)
 			newMaps = append(newMaps, sourceMap)
 		}

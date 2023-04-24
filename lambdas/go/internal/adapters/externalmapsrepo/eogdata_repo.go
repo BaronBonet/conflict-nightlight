@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type EogdataRepo struct {
@@ -132,7 +133,7 @@ func extractDateFromMonthlyLink(link string) (*domain.Date, error) {
 	}
 	return &domain.Date{
 		Year:  int(year),
-		Month: int(month),
+		Month: time.Month(month),
 		Day:   1,
 	}, nil
 }

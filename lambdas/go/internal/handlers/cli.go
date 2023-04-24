@@ -7,6 +7,7 @@ import (
 	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/services"
+	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
 	"github.com/urfave/cli/v2"
 	"os"
 	"sort"
@@ -110,10 +111,7 @@ func NewCLIHandler(ctx context.Context, productService *services.OrchestratorSer
 					if err := json.Unmarshal([]byte(c.Args().Get(0)), &syncMapRequest); err != nil {
 						return err
 					}
-					_, err := productService.SyncInternalWithExternal(ctx, domain.Bounds(syncMapRequest.Bounds), domain.MapType(syncMapRequest.MapType), domain.SelectedDates{
-						Months: convertInts[int](syncMapRequest.SelectedMonths),
-						Years:  convertInts[int](syncMapRequest.SelectedYears),
-					})
+					_, err := productService.SyncInternalWithExternalMaps(ctx, prototransformers.ProtoToSyncMapsRequest(&syncMapRequest))
 					if err != nil {
 						return err
 					}
@@ -183,16 +181,4 @@ func printMapsAsTable(maps []domain.Map) error {
 	}
 
 	return writer.Flush()
-}
-
-type Int interface {
-	~int | ~int32 | ~int64
-}
-
-func convertInts[U, T Int](s []T) (out []U) {
-	out = make([]U, len(s))
-	for i := range s {
-		out[i] = U(s[i])
-	}
-	return out
 }
