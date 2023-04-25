@@ -26,7 +26,7 @@ jobs:
     strategy:
       matrix:
         name: [ map_controller, map_publisher ]
-    uses: ./.github/workflows/build-deploy-go.yml
+    uses: ./.github/actions/build-deploy-go.yml
     with:
       name: ${{ matrix.name }}
       zip-tag: ${{ needs.image-tag.outputs.image-tag }}
@@ -36,7 +36,7 @@ jobs:
     needs:
       - image-tag
     secrets: inherit
-    uses: ./.github/workflows/build-deploy-docker-image.yml
+    uses: ./.github/actions/build-deploy-docker-image.yml
     with:
       deploy: true
       image-tag: ${{ needs.image-tag.outputs.image-tag }}
@@ -45,7 +45,7 @@ jobs:
     needs:
       - image-tag
     secrets: inherit
-    uses: ./.github/workflows/build-deploy-react.yml
+    uses: ./.github/actions/build-deploy-react.yml
     with:
       deploy: true
       version: ${{ needs.image-tag.outputs.image-tag }}
