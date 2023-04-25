@@ -117,9 +117,6 @@ func (srv *OrchestratorService) findNewMaps(ctx context.Context, cropper domain.
 	if err != nil {
 		return nil, errors.New("get internal maps from internalMapRepository has failed, error: " + err.Error())
 	}
-	for _, internalMap := range internalMaps {
-		println(internalMap.Source.URL)
-	}
 	srv.logger.Debug(ctx, "Successfully extracted internal maps", "internalMaps", internalMaps)
 
 	sourceMaps, err := srv.externalMapsRepo.List(ctx, cropper, mapType)
