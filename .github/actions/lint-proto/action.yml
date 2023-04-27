@@ -1,0 +1,19 @@
+name: lint proto
+
+runs:
+  using: composite
+  steps:
+    - uses: bufbuild/buf-setup-action@v1
+      with:
+        github_token: ${{ github.token }}
+
+    - run: buf format --diff --exit-code
+      shell: bash
+
+    - run: buf generate --log-format text --template proto/buf.gen.go.yaml
+      shell: bash
+
+    - run: buf generate --log-format text --template proto/buf.gen.python.yaml
+      shell: bash
+
+    - uses: bufbuild/buf-lint-action@v1
