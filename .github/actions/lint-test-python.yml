@@ -36,6 +36,11 @@ jobs:
           version: ${{ env.POETRY_VERSION }}
           virtualenvs-in-project: true
 
+      
+      - name: Check poetry lock
+        working-directory: ${{ inputs.working_directory }}
+        run: poetry lock --check
+
       - name: Load cached virtualenv
         id: cached-dependencies
         uses: actions/cache@v3
