@@ -8,9 +8,11 @@ import (
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/services"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/urfave/cli/v2"
 	"os"
 	"sort"
+	"strings"
 	"text/tabwriter"
 )
 
@@ -105,10 +107,10 @@ func NewCLIHandler(ctx context.Context, productService *services.OrchestratorSer
 				ArgsUsage: "[syncMapRequest]",
 				Action: func(c *cli.Context) error {
 					if c.NArg() < 1 {
-						return fmt.Errorf("the map argument is required")
+						return fmt.Errorf("the syncMapRequest argument is required")
 					}
 					syncMapRequest := conflict_nightlightv1.SyncMapRequest{}
-					if err := json.Unmarshal([]byte(c.Args().Get(0)), &syncMapRequest); err != nil {
+					if err := jsonpb.Unmarshal(strings.NewReader(c.Args().Get(0)), &syncMapRequest); err != nil {
 						return err
 					}
 					_, err := productService.SyncInternalWithExternalMaps(ctx, prototransformers.ProtoToSyncMapsRequest(&syncMapRequest))

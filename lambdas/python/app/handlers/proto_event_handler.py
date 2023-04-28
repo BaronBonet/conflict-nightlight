@@ -32,19 +32,15 @@ def handle_event(event: dict[str, str], correlation_id: str):
     )
     request = RequestWrapper().from_dict(event)
     if is_used(request.download_and_crop_raw_tif_request):
-        download_and_crop_raw_tif_request(logger, request, correlation_id, write_dir)
+        download_and_crop_raw_tif(logger, request, correlation_id, write_dir)
 
     elif is_used(request.create_map_product_request):
-        create_new_map_product_request(
-            logger=logger, request=request, correlation_id=correlation_id, write_dir=write_dir
-        )
+        create_new_map_product(logger=logger, request=request, correlation_id=correlation_id, write_dir=write_dir)
     else:
         logger.fatal("unknown event", **event)
 
 
-def create_new_map_product_request(
-    logger: ports.Logger, request: RequestWrapper, correlation_id: str, write_dir: pathlib.Path
-):
+def create_new_map_product(logger: ports.Logger, request: RequestWrapper, correlation_id: str, write_dir: pathlib.Path):
     logger.debug("Configuring service to handle new map product request", request=request.to_json())
     message_notification_queue = NewMessageNotificationQueue(
         queue_name=os.getenv("PUBLISH_MAP_PRODUCT_REQUEST_QUEUE", "conflict-nightlight-publish-map-product-request"),
@@ -70,7 +66,7 @@ def create_new_map_product_request(
     service.process_save(proto_map_to_domain(request.create_map_product_request.map))
 
 
-def download_and_crop_raw_tif_request(
+def download_and_crop_raw_tif(
     logger: ports.Logger, request: RequestWrapper, correlation_id: str, write_dir: pathlib.Path
 ):
     logger.debug("Configuring service to handle a download raw tif request", request=request.to_json())

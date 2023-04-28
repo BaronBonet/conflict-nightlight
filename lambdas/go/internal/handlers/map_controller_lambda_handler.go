@@ -3,19 +3,11 @@ package handlers
 import (
 	"context"
 	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
-	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/services"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
 )
-
-type SyncMapsRequest struct {
-	Bounds         string `json:"bounds"`
-	MapType        string `json:"mapType"`
-	SelectedMonths []int  `json:"selectedMonths"`
-	SelectedYears  []int  `json:"selectedYears"`
-}
 
 type MapControllerLambdaEventHandler struct {
 	logger ports.Logger
@@ -26,15 +18,27 @@ func NewMapControllerLambdaHandler(logger ports.Logger, srv *services.Orchestrat
 	return &MapControllerLambdaEventHandler{logger: logger, srv: srv}
 }
 
-func (handler *MapControllerLambdaEventHandler) HandleEvent(_ context.Context, request *conflict_nightlightv1.SyncMapRequest) {
-	ctx := infrastructure.NewContext()
-	bounds := domain.Bounds(request.Bounds)
-	if bounds == domain.BoundsUnspecified {
-		handler.logger.Fatal(ctx, "Unknown bounds", "supplied bounds", bounds)
+func (handler *MapControllerLambdaEventHandler) HandleEvent(_ context.Context, payload interface{}) {
+	request, ok := payload.(conflict_nightlightv1.SyncMapRequest)
+	if !ok {
+		handler.logger.Fatal(context.Background(), "Error while casting payload to SyncMapRequest")
 	}
-	count, err := handler.srv.SyncInternalWithExternalMaps(ctx, prototransformers.ProtoToSyncMapsRequest(request))
+
+	ctx := infrastructure.NewContext()
+
+	if request.Bounds == conflict_nightlightv1.Bounds_BOUNDS_UNSPECIFIED {
+		handler.logger.Fatal(ctx, "Bounds cannot be unspecified")
+	}
+	if request.MapType == conflict_nightlightv1.MapType_MAP_TYPE_UNSPECIFIED {
+		handler.logger.Fatal(ctx, "Map type cannot be unspecified")
+	}
+	count, err := handler.srv.SyncInternalWithExternalMaps(ctx, prototransformers.ProtoToSyncMapsRequest(&request))
 	if err != nil {
 		handler.logger.Fatal(ctx, "Error while publishing map.", "error", err)
 	}
-	handler.logger.Info(ctx, "Successfully scraped and requested for new maps", "new-maps-added", count)
+	if *count > 0 {
+		handler.logger.Info(ctx, "Successfully scraped and requested for new maps", "new-maps-added", count)
+	} else {
+		handler.logger.Info(ctx, "No new maps found")
+	}
 }

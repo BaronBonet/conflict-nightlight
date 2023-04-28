@@ -1,0 +1,60 @@
+name: Deploy react to S3
+
+inputs:
+  aws-access-key-id:
+    required: false
+  aws-secret-access-key:
+    required: false
+  react-app-mapbox-token:
+    required: false
+    type: string
+    default: undefined
+  version:
+    required: false
+    type: string
+    default: undefined
+  deploy:
+    description: Whether to deploy the image to ECR since github actions don't have a boolean use 'true' or
+    required: false
+    default: false
+  s3-bucket-name:
+    required: false
+    default: conflict-nightlight-frontend
+  domain-name:
+    required: false
+    default: conflictnightlight.com
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: frontend
+      run: yarn install
+
+    - name: Build app
+      shell: bash
+      working-directory: frontend
+      run: REACT_APP_MAPBOX_TOKEN=${{ inputs.react-app-mapbox-token }} REACT_APP_VERSION=${{ inputs.version }} yarn build
+
+    - name: Configure AWS
+      if: ${{ inputs.deploy == 'true' }}
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: eu-central-1
+
+    - name: Push to S3
+      working-directory: frontend
+      shell: bash
+      if: ${{ inputs.deploy == 'true' }}
+      run: aws s3 cp build s3://${{ inputs.s3-bucket-name }}/ --recursive
+
+    - name: Invalidate Cloudfront Cache
+      if: ${{ inputs.deploy == 'true' }}
+      shell: bash
+      working-directory: frontend
+      run: aws cloudfront create-invalidation --distribution-id $(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[0]=='${{ inputs.domain-name }}'].Id | [0]" --output text) --paths "/*"

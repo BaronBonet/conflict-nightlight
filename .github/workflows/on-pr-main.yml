@@ -7,29 +7,53 @@ on:
 
 jobs:
   python-lint-test:
-    uses: ./.github/workflows/lint-test-python.yml
+    name: Lint and test python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/lint-test-python
 
   python-image-builder:
+    name: Build python image
+    runs-on: ubuntu-latest
     needs: python-lint-test
-    uses: ./.github/workflows/build-deploy-docker-image.yml
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/build-deploy-docker-image
 
   go-lint-test:
-    uses: ./.github/workflows/lint-test-go.yml
+    name: Lint and test go
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/lint-test-go
 
   go-builder:
+    name: Build go
     needs: go-lint-test
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         name: [ map_controller, map_publisher ]
-    uses: ./.github/workflows/build-deploy-go.yml
-    with:
-      name: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/build-deploy-go
+        with:
+          name: ${{ matrix.name }}
 
   react-builder:
-    uses: ./.github/workflows/build-deploy-react.yml
+     name: Build react
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v3
+       - uses: ./.github/actions/build-deploy-react
 
-  proto-lint:
-    uses: ./.github/workflows/lint-proto.yml
+  proto-linter:
+    name: Lint proto
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/lint-proto
 
   # https://github.com/community/community/discussions/4324
   can-deploy:
@@ -40,7 +64,7 @@ jobs:
       - go-lint-test
       - go-builder
       - react-builder
-      - proto-lint
+      - proto-linter
     if: always()
     steps:
       - name: successful
