@@ -1,0 +1,86 @@
+name: Go zip builder and deployer
+
+inputs:
+  name:
+    required: true
+    type: string
+  aws-access-key-id:
+    required: false
+  aws-secret-access-key:
+    required: false
+  zip-tag:
+    required: false
+    default: undefined
+  deploy:
+    description: Whether to deploy the image to ECR since github actions don't have a boolean use 'true' or
+    required: false
+    default: false
+  s3-bucket-name:
+    required: false
+    default: conflict-nightlight-zip-deployables
+  working-dir:
+    required: false
+    default: lambdas/go
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: ${{ inputs.working-dir }}/go.mod
+        cache-dependency-path: ${{ inputs.working-dir }}/go.mod
+        cache: true
+
+    - run: go install golang.org/x/tools/cmd/stringer@latest
+      shell: bash
+
+    - name: install buf
+      uses: bufbuild/buf-setup-action@v1
+      with:
+        github_token: ${{ github.token }}
+
+    - name: Create bin for mockery
+      shell: bash
+      run: |
+        mkdir -p "$PWD/bin"
+        echo "$PWD/bin" >> $GITHUB_PATH
+
+    - name: install mockery
+      shell: bash
+      run: |
+        tar -xz -C bin -f <(curl -Ls https://github.com/vektra/mockery/releases/download/v2.25.0/mockery_2.25.0_Linux_x86_64.tar.gz)
+
+    - name: build go app
+      shell: bash
+      run: make build-go-aws APP=${{ inputs.name }}
+
+    - name: Configure AWS
+      if: ${{ inputs.deploy == 'true' }}
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: eu-central-1
+
+    - name: Replace underscores in name with hyphens
+      id: replace-underscore
+      if: ${{ inputs.deploy == 'true' }}
+      shell: bash
+      run: echo "hyphen-name=$(echo ${{ inputs.name }} | tr _ - )" >> $GITHUB_OUTPUT
+
+    - name: Push to S3
+      shell: bash
+      if: ${{ inputs.deploy == 'true' }}
+      run: |
+        aws s3 cp lambdas/go/out/${{ inputs.name }}/handler/main.zip \
+          s3://${{ inputs.s3-bucket-name }}/${{ steps.replace-underscore.outputs.hyphen-name }}/${{ inputs.zip-tag }}.zip
+        aws s3 cp s3://${{ inputs.s3-bucket-name }}/${{ steps.replace-underscore.outputs.hyphen-name }}/${{ inputs.zip-tag }}.zip \
+          s3://${{ inputs.s3-bucket-name }}/${{ steps.replace-underscore.outputs.hyphen-name }}/latest.zip
+
+    - name: Update lambda
+      shell: bash
+      if: ${{ inputs.deploy == 'true' }}
+      run: |
+        aws lambda update-function-code --function-name conflict-nightlight-${{ steps.replace-underscore.outputs.hyphen-name }}-function \
+          --s3-bucket ${{ inputs.s3-bucket-name }} \
+          --s3-key ${{ steps.replace-underscore.outputs.hyphen-name }}/${{ inputs.zip-tag }}.zip

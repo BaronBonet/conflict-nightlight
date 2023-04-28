@@ -157,7 +157,7 @@ func (repo *MapBoxTileServerRepo) getMapboxTempCreds(ctx context.Context, userna
 		repo.logger.Error(ctx, "Error when unmarshalling mapbox credentials", "error", err)
 		return nil, err
 	}
-	// TODO check that it is not returned as not found
+
 	if tempCreds.AccessKeyId == "" {
 		repo.logger.Error(ctx, "There was an issue when extracting the temporary credentials", "response", string(body))
 		return nil, errors.New("there was an issue when extracting the temporary credentials from mapbox")

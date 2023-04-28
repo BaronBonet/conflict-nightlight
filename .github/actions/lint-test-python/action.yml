@@ -1,0 +1,87 @@
+name: Python lint, test build
+description: Lint, test, and build python code
+
+inputs:
+  python-version:
+    required: false
+    description: 'Python version to install'
+    default: '3.10.6'
+  poetry-version:
+    required: false
+    description: 'Poetry version to install'
+    default: '1.2.1'
+  working-directory:
+    required: false
+    description: 'Working directory'
+    default: 'lambdas/python'
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+
+    - name: Install python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Load cached poetry
+      uses: actions/cache@v3
+      with:
+        path: ~/.local/
+        key: poetry-cache-${{ steps.setup-python.outputs.python-version }}-${{ inputs.poetry-version }}
+
+    - name: Install poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: ${{ inputs.poetry-version }}
+        virtualenvs-in-project: true
+
+    - name: Verify Poetry dependencies
+      working-directory: ${{ inputs.working-directory }}
+      run: poetry lock --check
+      shell: bash
+
+    - name: Load cached virtualenv
+      id: cached-dependencies
+      uses: actions/cache@v3
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles(format('{0}/poetry.lock', inputs.poetry-version)) }}
+        restore-keys: |
+          venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-
+
+    - name: Install dependencies
+      working-directory: ${{ inputs.working-directory }}
+      run: poetry install --no-interaction --no-root --sync
+      shell: bash
+
+    - name: Run black
+      working-directory: ${{ inputs.working-directory }}
+      run: poetry run black --config pyproject.toml --check .
+      shell: bash
+
+    - name: Run isort
+      uses: isort/isort-action@master
+      with:
+        working-directory: ${{ inputs.working-directory }}
+        configuration: --profile black
+
+    - name: install buf
+      uses: bufbuild/buf-setup-action@v1
+      with:
+        github_token: ${{ github.token }}
+
+    - name: Generate python proto stubs
+      run: make generate-python
+      shell: bash
+
+    - name: Run flake8
+      uses: py-actions/flake8@v2
+      with:
+        args: --config ${{ inputs.working-directory }}/.flake8
+
+    - name: Run pytest
+      working-directory: ${{ inputs.working-directory }}
+      run: poetry run pytest
+      shell: bash

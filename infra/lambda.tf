@@ -57,13 +57,13 @@ resource "aws_lambda_function" "conflict_nightlight_python_lambda_function" {
   environment {
     variables = {
       WRITE_DIR                         = "/tmp"
-      WRITE_BUCKET                      = var.raw_tif_bucket_name
+      RAW_TIF_BUCKET                    = var.raw_tif_bucket_name
       CORRELATION_ID_KEY_NAME           = var.correlation_id_key
       CREATE_MAP_PRODUCT_REQUEST_QUEUE  = aws_sqs_queue.create_map_product_request_queue.name
       PUBLISH_MAP_PRODUCT_REQUEST_QUEUE = aws_sqs_queue.publish_map_product_request_queue.name
       PROCESSED_TIF_BUCKET_NAME         = aws_s3_bucket.processed_tif.bucket
       CONFLICT_NIGHTLIGHT_SECRETS_KEY   = aws_secretsmanager_secret.conflict_nightlight-secrets.name
-      USES_DEBUG_LOGGER                 = "true"
+      USES_DEBUG_LOGGER                 = "false"
     }
   }
   function_name = "${var.prefix}-${var.python_lambda}-function"

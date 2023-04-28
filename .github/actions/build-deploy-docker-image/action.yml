@@ -1,0 +1,86 @@
+name: Docker image builder and deployer
+description: Build and deploy them python docker image to ECR
+
+inputs:
+  image-tag:
+    required: false
+    description: The tag of the image which corresponds to the git sha
+    default: untagged
+  deploy:
+    required: false
+    description: Whether to deploy the image to ECR since github actions don't have a boolean use 'true' or
+      'false'
+    default: false
+  aws-access-key-id:
+    required: false
+  aws-secret-access-key:
+    required: false
+  ecr-registry:
+    required: false
+    default: 028220097019.dkr.ecr.eu-central-1.amazonaws.com
+  project-prefix:
+    required: false
+    default: conflict-nightlight
+  function-name:
+    required: false
+    default: python-app
+  working-dir:
+    required: true
+    default: lambdas/python
+
+
+runs:
+  using: composite
+  steps:
+    - name: Set docker image tag
+      id: set-docker-image-tag
+      shell: bash
+      run: |
+        echo "docker-image-tag=${{ inputs.ecr-registry }}/${{ inputs.project-prefix }}-${{ inputs.function-name }}-repo:${{ inputs.image-tag }}" >> $GITHUB_OUTPUT
+        echo "docker-image-tag-latest=${{ inputs.ecr-registry }}/${{ inputs.project-prefix }}-${{ inputs.function-name }}-repo:latest" >> $GITHUB_OUTPUT
+
+    - name: Install protobuf
+      id: install-protobuf
+      uses: bufbuild/buf-setup-action@v1
+      with:
+        github_token: ${{ github.token }}
+
+    - name: Generate python proto stubs
+      shell: bash
+      run: make generate-python
+
+    - uses: aws-actions/configure-aws-credentials@v2
+      if: ${{ inputs.deploy == 'true' }}
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: eu-central-1
+
+    - id: login-ecr
+      if: ${{ inputs.deploy == 'true' }}
+      shell: bash
+      run: |
+        aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${{ inputs.ecr-registry }}
+
+    - uses: docker/setup-buildx-action@v2
+
+    - name: Build image
+      uses: docker/build-push-action@v3
+      with:
+        push: ${{ inputs.deploy }}
+        context: ${{ inputs.working-dir }}
+        file: ${{ inputs.working-dir }}/Dockerfile
+        build-args: |
+          VERSION=${{ inputs.image-tag }}
+        platforms: linux/amd64
+        tags: |
+          ${{ steps.set-docker-image-tag.outputs.docker-image-tag }}
+          ${{ steps.set-docker-image-tag.outputs.docker-image-tag-latest }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Update image on lambda
+      shell: bash
+      if: ${{ inputs.deploy == 'true' }}
+      run: |
+        aws lambda update-function-code --function-name ${{ inputs.project-prefix }}-${{ inputs.function-name }}-function --image-uri ${{ steps.set-docker-image-tag.outputs.docker-image-tag }}
