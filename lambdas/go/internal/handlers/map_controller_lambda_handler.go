@@ -7,8 +7,6 @@ import (
 	"github.com/BaronBonet/conflict-nightlight/internal/core/services"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
-	"github.com/golang/protobuf/jsonpb"
-	"strings"
 )
 
 type MapControllerLambdaEventHandler struct {
@@ -20,14 +18,9 @@ func NewMapControllerLambdaHandler(logger ports.Logger, srv *services.Orchestrat
 	return &MapControllerLambdaEventHandler{logger: logger, srv: srv}
 }
 
-func (handler *MapControllerLambdaEventHandler) HandleEvent(_ context.Context, payload string) {
+func (handler *MapControllerLambdaEventHandler) HandleEvent(_ context.Context, request *conflict_nightlightv1.SyncMapRequest) {
 	ctx := infrastructure.NewContext()
 
-	request := &conflict_nightlightv1.SyncMapRequest{}
-
-	if err := jsonpb.Unmarshal(strings.NewReader(payload), request); err != nil {
-		handler.logger.Fatal(ctx, "Error while unmarshaling JSON payload.", "error", err)
-	}
 	if request.Bounds == conflict_nightlightv1.Bounds_BOUNDS_UNSPECIFIED {
 		handler.logger.Fatal(ctx, "Bounds cannot be unspecified")
 	}
@@ -38,5 +31,9 @@ func (handler *MapControllerLambdaEventHandler) HandleEvent(_ context.Context, p
 	if err != nil {
 		handler.logger.Fatal(ctx, "Error while publishing map.", "error", err)
 	}
-	handler.logger.Info(ctx, "Successfully scraped and requested for new maps", "new-maps-added", count)
+	if *count > 0 {
+		handler.logger.Info(ctx, "Successfully scraped and requested for new maps", "new-maps-added", count)
+	} else {
+		handler.logger.Info(ctx, "No new maps found")
+	}
 }
