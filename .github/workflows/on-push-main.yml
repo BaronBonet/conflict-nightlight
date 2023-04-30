@@ -1,10 +1,9 @@
 name: On push main
 
 on:
-  push
-#  push:
-#    branches:
-#      - main
+  push:
+    branches:
+      - main
 
 
 # TODO inject variables to go and react, for the file shared with the CDN
@@ -38,31 +37,31 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-#  python-image-builder-and-deployer:
-#    name: Build and deploy python docker
-#    runs-on: ubuntu-latest
-#    needs:
-#      - image-tag
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: ./.github/actions/build-deploy-docker-image
-#        with:
-#          deploy: true
-#          image-tag: ${{ needs.image-tag.outputs.image-tag }}
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#
-#  react-image-builder-and-deployer:
-#    name: Build and push react to S3
-#    runs-on: ubuntu-latest
-#    needs:
-#      - image-tag
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: ./.github/actions/build-deploy-react
-#        with:
-#          deploy: true
-#          version: ${{ needs.image-tag.outputs.image-tag }}
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          react-app-mapbox-token: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}
+  python-image-builder-and-deployer:
+    name: Build and deploy python docker
+    runs-on: ubuntu-latest
+    needs:
+      - image-tag
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/build-deploy-docker-image
+        with:
+          deploy: true
+          image-tag: ${{ needs.image-tag.outputs.image-tag }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  react-image-builder-and-deployer:
+    name: Build and push react to S3
+    runs-on: ubuntu-latest
+    needs:
+      - image-tag
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/build-deploy-react
+        with:
+          deploy: true
+          version: ${{ needs.image-tag.outputs.image-tag }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          react-app-mapbox-token: ${{ secrets.REACT_APP_MAPBOX_TOKEN }}

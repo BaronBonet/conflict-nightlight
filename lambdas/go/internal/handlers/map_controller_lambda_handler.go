@@ -18,12 +18,7 @@ func NewMapControllerLambdaHandler(logger ports.Logger, srv *services.Orchestrat
 	return &MapControllerLambdaEventHandler{logger: logger, srv: srv}
 }
 
-func (handler *MapControllerLambdaEventHandler) HandleEvent(_ context.Context, payload interface{}) {
-	request, ok := payload.(conflict_nightlightv1.SyncMapRequest)
-	if !ok {
-		handler.logger.Fatal(context.Background(), "Error while casting payload to SyncMapRequest")
-	}
-
+func (handler *MapControllerLambdaEventHandler) HandleEvent(_ context.Context, request *conflict_nightlightv1.SyncMapRequest) {
 	ctx := infrastructure.NewContext()
 
 	if request.Bounds == conflict_nightlightv1.Bounds_BOUNDS_UNSPECIFIED {
@@ -32,7 +27,7 @@ func (handler *MapControllerLambdaEventHandler) HandleEvent(_ context.Context, p
 	if request.MapType == conflict_nightlightv1.MapType_MAP_TYPE_UNSPECIFIED {
 		handler.logger.Fatal(ctx, "Map type cannot be unspecified")
 	}
-	count, err := handler.srv.SyncInternalWithExternalMaps(ctx, prototransformers.ProtoToSyncMapsRequest(&request))
+	count, err := handler.srv.SyncInternalWithExternalMaps(ctx, prototransformers.ProtoToSyncMapsRequest(request))
 	if err != nil {
 		handler.logger.Fatal(ctx, "Error while publishing map.", "error", err)
 	}
