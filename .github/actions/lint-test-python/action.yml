@@ -64,7 +64,6 @@ runs:
     - name: Run isort
       uses: isort/isort-action@master
       with:
-        working-directory: ${{ inputs.working-directory }}
         configuration: --profile black
 
     - name: install buf
