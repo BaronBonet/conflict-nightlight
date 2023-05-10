@@ -38,3 +38,4 @@ yarn-error.log*
 
 conflict-nightlight-map-options.json
 debugger
+.python-version
