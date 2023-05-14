@@ -4,7 +4,6 @@ import (
 	"context"
 	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
-	"github.com/BaronBonet/conflict-nightlight/internal/core/services"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
 	"github.com/aws/aws-lambda-go/events"
@@ -13,10 +12,10 @@ import (
 
 type MapPublisherLambdaEventHandler struct {
 	logger ports.Logger
-	srv    *services.OrchestratorService
+	srv    ports.OrchestratorService
 }
 
-func NewMapPublisherLambdaHandler(logger ports.Logger, srv *services.OrchestratorService) *MapPublisherLambdaEventHandler {
+func NewMapPublisherLambdaHandler(logger ports.Logger, srv ports.OrchestratorService) *MapPublisherLambdaEventHandler {
 	return &MapPublisherLambdaEventHandler{logger: logger, srv: srv}
 }
 

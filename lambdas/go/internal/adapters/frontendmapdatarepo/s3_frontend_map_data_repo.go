@@ -17,23 +17,23 @@ import (
 	"time"
 )
 
-type S3FrontendMapDataRepo struct {
+type s3FrontendMapDataRepo struct {
 	logger     ports.Logger
 	awsClient  awsclient.AWSClient
 	bucketName string
 	objectKey  string
 }
 
-func NewS3FrontendMapDataRepo(ctx context.Context, logger ports.Logger, bucketName string, objectKey string) *S3FrontendMapDataRepo {
+func NewS3FrontendMapDataRepo(ctx context.Context, logger ports.Logger, bucketName string, objectKey string) ports.FrontendMapDataRepo {
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-central-1"))
 	if err != nil {
 		logger.Fatal(ctx, "Error when attempting to load the aws config", "error", err)
 	}
 	awsClient := awsclient.NewAWSClient(cfg)
-	return &S3FrontendMapDataRepo{logger: logger, bucketName: bucketName, objectKey: objectKey, awsClient: awsClient}
+	return &s3FrontendMapDataRepo{logger: logger, bucketName: bucketName, objectKey: objectKey, awsClient: awsClient}
 }
 
-func (repo *S3FrontendMapDataRepo) List(ctx context.Context) ([]domain.PublishedMap, error) {
+func (repo *s3FrontendMapDataRepo) List(ctx context.Context) ([]domain.PublishedMap, error) {
 	object, err := repo.awsClient.GetFromS3(ctx, repo.bucketName, repo.objectKey)
 	if err != nil {
 		repo.logger.Error(ctx, "Error when attempting to list objects in s3", "error", err)
@@ -58,7 +58,7 @@ func (repo *S3FrontendMapDataRepo) List(ctx context.Context) ([]domain.Published
 	return publishedMaps, nil
 }
 
-func (repo *S3FrontendMapDataRepo) Delete(ctx context.Context, m domain.Map) error {
+func (repo *s3FrontendMapDataRepo) Delete(ctx context.Context, m domain.Map) error {
 	jsonForFrontend, err := repo.awsClient.GetFromS3(ctx, repo.bucketName, repo.objectKey)
 	if err != nil {
 		return err
@@ -101,7 +101,7 @@ func removeMapOptionFromList(list []*conflict_nightlightv1.MapOptions, toDelete 
 	return list
 }
 
-func (repo *S3FrontendMapDataRepo) Upsert(ctx context.Context, m domain.PublishedMap) error {
+func (repo *s3FrontendMapDataRepo) Upsert(ctx context.Context, m domain.PublishedMap) error {
 	jsonForFrontend, err := repo.awsClient.GetFromS3(ctx, repo.bucketName, repo.objectKey)
 
 	var mapOptionsList []*conflict_nightlightv1.MapOptions

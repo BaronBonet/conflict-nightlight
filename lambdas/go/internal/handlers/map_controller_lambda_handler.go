@@ -4,17 +4,16 @@ import (
 	"context"
 	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
-	"github.com/BaronBonet/conflict-nightlight/internal/core/services"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
 )
 
 type MapControllerLambdaEventHandler struct {
 	logger ports.Logger
-	srv    *services.OrchestratorService
+	srv    ports.OrchestratorService
 }
 
-func NewMapControllerLambdaHandler(logger ports.Logger, srv *services.OrchestratorService) *MapControllerLambdaEventHandler {
+func NewMapControllerLambdaHandler(logger ports.Logger, srv ports.OrchestratorService) *MapControllerLambdaEventHandler {
 	return &MapControllerLambdaEventHandler{logger: logger, srv: srv}
 }
 

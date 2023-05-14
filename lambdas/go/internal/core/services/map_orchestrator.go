@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-type OrchestratorService struct {
+type service struct {
 	logger                   ports.Logger
 	externalMapsRepo         ports.ExternalMapProviderRepo
 	rawInternalMapRepo       ports.InternalMapRepo
@@ -19,8 +19,8 @@ type OrchestratorService struct {
 	mapTileServerRepo        ports.MapTileServerRepo
 }
 
-func NewOrchestratorService(logger ports.Logger, externalMapsRepo ports.ExternalMapProviderRepo, rawInternalMapRepo ports.InternalMapRepo, processedInternalMapRepo ports.InternalMapRepo, frontendMapDataRepo ports.FrontendMapDataRepo, mapTileServerRepo ports.MapTileServerRepo) *OrchestratorService {
-	return &OrchestratorService{
+func NewOrchestratorService(logger ports.Logger, externalMapsRepo ports.ExternalMapProviderRepo, rawInternalMapRepo ports.InternalMapRepo, processedInternalMapRepo ports.InternalMapRepo, frontendMapDataRepo ports.FrontendMapDataRepo, mapTileServerRepo ports.MapTileServerRepo) ports.OrchestratorService {
+	return &service{
 		logger:                   logger,
 		externalMapsRepo:         externalMapsRepo,
 		processedInternalMapRepo: processedInternalMapRepo,
@@ -31,7 +31,7 @@ func NewOrchestratorService(logger ports.Logger, externalMapsRepo ports.External
 }
 
 // SyncInternalWithExternalMaps syncs the maps from the external map repo with the maps we have in the internal map repo
-func (srv *OrchestratorService) SyncInternalWithExternalMaps(ctx context.Context, request domain.SyncMapRequest) (*int, error) {
+func (srv *service) SyncInternalWithExternalMaps(ctx context.Context, request domain.SyncMapRequest) (*int, error) {
 	newMaps, err := srv.findNewMaps(ctx, request.Bounds, request.MapType, request.SelectedDates)
 	if err != nil {
 		srv.logger.Error(ctx, "Error when finding new maps", "error", err)
@@ -45,19 +45,19 @@ func (srv *OrchestratorService) SyncInternalWithExternalMaps(ctx context.Context
 	return &count, nil
 }
 
-func (srv *OrchestratorService) ListRawInternalMaps(ctx context.Context) ([]domain.Map, error) {
+func (srv *service) ListRawInternalMaps(ctx context.Context) ([]domain.Map, error) {
 	return srv.rawInternalMapRepo.List(ctx, srv.externalMapsRepo.GetProvider(), domain.BoundsUnspecified, domain.MapTypeUnspecified)
 }
 
-func (srv *OrchestratorService) ListProcessedInternalMaps(ctx context.Context) ([]domain.Map, error) {
+func (srv *service) ListProcessedInternalMaps(ctx context.Context) ([]domain.Map, error) {
 	return srv.processedInternalMapRepo.List(ctx, domain.MapProviderUnspecified, domain.BoundsUnspecified, domain.MapTypeUnspecified)
 }
 
-func (srv *OrchestratorService) ListPublishedMaps(ctx context.Context) ([]domain.PublishedMap, error) {
+func (srv *service) ListPublishedMaps(ctx context.Context) ([]domain.PublishedMap, error) {
 	return srv.frontendMapDataRepo.List(ctx)
 }
 
-func (srv *OrchestratorService) PublishMap(ctx context.Context, m domain.Map) error {
+func (srv *service) PublishMap(ctx context.Context, m domain.Map) error {
 	theMap, err := srv.processedInternalMapRepo.Download(ctx, m)
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func (srv *OrchestratorService) PublishMap(ctx context.Context, m domain.Map) er
 }
 
 // DeleteMap deletes a map from all the repos
-func (srv *OrchestratorService) DeleteMap(ctx context.Context, m domain.Map) {
+func (srv *service) DeleteMap(ctx context.Context, m domain.Map) {
 	if err := srv.mapTileServerRepo.Delete(ctx, m); err != nil {
 		srv.logger.Error(ctx, "Map was not deleted from the tile server repo", "error", err)
 	} else {
@@ -107,7 +107,7 @@ func (srv *OrchestratorService) DeleteMap(ctx context.Context, m domain.Map) {
 	}
 }
 
-func (srv *OrchestratorService) findNewMaps(ctx context.Context, cropper domain.Bounds, mapType domain.MapType, selectedDates domain.SelectedDates) ([]domain.Map, error) {
+func (srv *service) findNewMaps(ctx context.Context, cropper domain.Bounds, mapType domain.MapType, selectedDates domain.SelectedDates) ([]domain.Map, error) {
 	validate := validator.New()
 	if err := validate.Struct(selectedDates); err != nil {
 		return nil, errors.New("the selected dates were not valid")
@@ -135,7 +135,7 @@ func (srv *OrchestratorService) findNewMaps(ctx context.Context, cropper domain.
 	return newMaps, nil
 }
 
-func (srv *OrchestratorService) addNewMaps(ctx context.Context, newMaps []domain.Map) (int, error) {
+func (srv *service) addNewMaps(ctx context.Context, newMaps []domain.Map) (int, error) {
 	var count int
 	for _, newMap := range newMaps {
 		err := srv.rawInternalMapRepo.Create(ctx, newMap)

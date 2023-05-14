@@ -13,24 +13,24 @@ import (
 	"time"
 )
 
-type EogdataRepo struct {
+type eogdataRepo struct {
 	logger  ports.Logger
 	scraper *colly.Collector
 }
 
-func NewEogdataExternalMapsRepository(logger ports.Logger, tmpWriteDir string) *EogdataRepo {
-	return &EogdataRepo{logger: logger, scraper: colly.NewCollector(
+func NewEogdataExternalMapsRepository(logger ports.Logger, tmpWriteDir string) ports.ExternalMapProviderRepo {
+	return &eogdataRepo{logger: logger, scraper: colly.NewCollector(
 		colly.CacheDir(tmpWriteDir),
 		colly.MaxDepth(5),
 		colly.AllowedDomains("eogdata.mines.edu"),
 	)}
 }
 
-func (repo *EogdataRepo) GetProvider() domain.MapProvider {
+func (repo *eogdataRepo) GetProvider() domain.MapProvider {
 	return domain.MapProviderEogdata
 }
 
-func (repo *EogdataRepo) List(ctx context.Context, bounds domain.Bounds, mapType domain.MapType) ([]domain.Map, error) {
+func (repo *eogdataRepo) List(ctx context.Context, bounds domain.Bounds, mapType domain.MapType) ([]domain.Map, error) {
 
 	tileId, err := boundsToTileID(bounds)
 	if err != nil {
