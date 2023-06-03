@@ -18,7 +18,7 @@ func TestS3FrontendMapDataRepo_Update(t *testing.T) {
 	ctx := context.Background()
 	mockLogger := ports.NewMockLogger(t)
 	mockAWSClient := awsclient.NewMockAWSClient(t)
-	mapRepo := &S3FrontendMapDataRepo{logger: mockLogger, awsClient: mockAWSClient, bucketName: "test-bucket", objectKey: "test-key"}
+	mapRepo := &s3FrontendMapDataRepo{logger: mockLogger, awsClient: mockAWSClient, bucketName: "test-bucket", objectKey: "test-key"}
 
 	url := "mapbox://test-tileset"
 	testMap := domain.PublishedMap{Map: domain.Map{
@@ -64,7 +64,7 @@ func TestS3FrontendMapDataRepo_Delete(t *testing.T) {
 	ctx := context.Background()
 	mockLogger := ports.NewMockLogger(t)
 	mockAWSClient := awsclient.NewMockAWSClient(t)
-	mapRepo := &S3FrontendMapDataRepo{logger: mockLogger, awsClient: mockAWSClient, bucketName: "test-bucket", objectKey: "test-key"}
+	mapRepo := &s3FrontendMapDataRepo{logger: mockLogger, awsClient: mockAWSClient, bucketName: "test-bucket", objectKey: "test-key"}
 
 	testMap := domain.Map{
 		Date:    domain.Date{Day: 1, Month: 2, Year: 2023},
@@ -109,7 +109,7 @@ func TestS3FrontendMapDataRepo_List(t *testing.T) {
 	ctx := context.Background()
 	mockLogger := ports.NewMockLogger(t)
 	mockAWSClient := awsclient.NewMockAWSClient(t)
-	mapRepo := &S3FrontendMapDataRepo{logger: mockLogger, awsClient: mockAWSClient, bucketName: "test-bucket", objectKey: "test-key"}
+	mapRepo := &s3FrontendMapDataRepo{logger: mockLogger, awsClient: mockAWSClient, bucketName: "test-bucket", objectKey: "test-key"}
 
 	mapOptionsJSON := `[{
     "display_name": "Jan 2021",

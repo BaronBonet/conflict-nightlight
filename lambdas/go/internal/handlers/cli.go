@@ -6,7 +6,7 @@ import (
 	"fmt"
 	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
-	"github.com/BaronBonet/conflict-nightlight/internal/core/services"
+	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/urfave/cli/v2"
@@ -20,7 +20,7 @@ type CliHandler struct {
 	app *cli.App
 }
 
-func NewCLIHandler(ctx context.Context, productService *services.OrchestratorService) *CliHandler {
+func NewCLIHandler(ctx context.Context, productService ports.OrchestratorService) *CliHandler {
 	app := &cli.App{
 		Name:                 "Map Controller",
 		EnableBashCompletion: true,

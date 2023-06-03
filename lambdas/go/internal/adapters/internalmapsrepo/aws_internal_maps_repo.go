@@ -9,7 +9,6 @@ import (
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/google/uuid"
 	"os"
 	"path/filepath"
@@ -33,12 +32,7 @@ type Bucket struct {
 	metadataKey string
 }
 
-func NewAWSInternalMapsRepository(ctx context.Context, logger ports.Logger, repoBucketName string, metadataKey string, persistRequestQueueName string, tmpWriteDir string) *AWSMapsRepo {
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-central-1"))
-	if err != nil {
-		logger.Fatal(ctx, "Error when attempting to load the aws config", "error", err)
-	}
-	awsClient := awsclient.NewAWSClient(cfg)
+func NewAWSInternalMapsRepository(logger ports.Logger, repoBucketName string, metadataKey string, persistRequestQueueName string, tmpWriteDir string, awsClient awsclient.AWSClient) ports.InternalMapRepo {
 	return &AWSMapsRepo{logger: logger, bucket: Bucket{
 		bucketName:  repoBucketName,
 		metadataKey: metadataKey,

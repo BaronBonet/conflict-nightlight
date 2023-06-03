@@ -20,7 +20,7 @@ import (
 	"time"
 )
 
-type MapBoxTileServerRepo struct {
+type mapBoxTileServerRepo struct {
 	logger    ports.Logger
 	secrets   mapboxSecrets
 	awsClient awsclient.AWSClient
@@ -31,7 +31,7 @@ type mapboxSecrets struct {
 	MapboxUsername    string `json:"mapboxUsername"`
 }
 
-func NewMapboxTileServerRepo(ctx context.Context, logger ports.Logger, secretsKey string) *MapBoxTileServerRepo {
+func NewMapboxTileServerRepo(ctx context.Context, logger ports.Logger, secretsKey string) ports.MapTileServerRepo {
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion("eu-central-1"))
 	if err != nil {
 		logger.Fatal(ctx, "Error when attempting to load the aws config", "error", err)
@@ -43,10 +43,10 @@ func NewMapboxTileServerRepo(ctx context.Context, logger ports.Logger, secretsKe
 	if err != nil {
 		logger.Fatal(ctx, "Error when getting secrets from secrets manager", "secretKey", secretsKey, "error", err)
 	}
-	return &MapBoxTileServerRepo{logger: logger, secrets: secrets, awsClient: awsClient}
+	return &mapBoxTileServerRepo{logger: logger, secrets: secrets, awsClient: awsClient}
 }
 
-func (repo *MapBoxTileServerRepo) Publish(ctx context.Context, m domain.LocalMap) (*domain.PublishedMap, error) {
+func (repo *mapBoxTileServerRepo) Publish(ctx context.Context, m domain.LocalMap) (*domain.PublishedMap, error) {
 	tempCreds, err := repo.getMapboxTempCreds(ctx, repo.secrets.MapboxUsername, repo.secrets.MapboxPublicToken)
 	if err != nil {
 		repo.logger.Error(ctx, "Error when getting temp creds from mapbox", "error", err)
@@ -67,7 +67,7 @@ func (repo *MapBoxTileServerRepo) Publish(ctx context.Context, m domain.LocalMap
 	return &domain.PublishedMap{Map: m.Map, Url: fmt.Sprintf("mapbox://%s", tileset)}, nil
 }
 
-func (repo *MapBoxTileServerRepo) Delete(ctx context.Context, m domain.Map) error {
+func (repo *mapBoxTileServerRepo) Delete(ctx context.Context, m domain.Map) error {
 	repo.logger.Info(ctx, "Deleting map from mapbox", "map", m.String())
 	tilesetID := fmt.Sprintf("%s.%s", repo.secrets.MapboxUsername, m.String())
 
@@ -124,7 +124,7 @@ type uploadStatus struct {
 	Progress int       `json:"progress"`
 }
 
-func (repo *MapBoxTileServerRepo) getMapboxTempCreds(ctx context.Context, username string, token string) (*mapBoxTempCreds, error) {
+func (repo *mapBoxTileServerRepo) getMapboxTempCreds(ctx context.Context, username string, token string) (*mapBoxTempCreds, error) {
 	url := fmt.Sprintf("https://api.mapbox.com/uploads/v1/%s/credentials?access_token=%s", username, token)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -165,7 +165,7 @@ func (repo *MapBoxTileServerRepo) getMapboxTempCreds(ctx context.Context, userna
 	return &tempCreds, nil
 }
 
-func (repo *MapBoxTileServerRepo) uploadToMapboxTempS3(ctx context.Context, localFilepath string, tempAWSCreds mapBoxTempCreds) {
+func (repo *mapBoxTileServerRepo) uploadToMapboxTempS3(ctx context.Context, localFilepath string, tempAWSCreds mapBoxTempCreds) {
 	repo.logger.Debug(ctx, "Uploading tif to Mapbox's temp s3 bucket", "localFilepath", localFilepath)
 	cfg, err := config.LoadDefaultConfig(ctx, config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(tempAWSCreds.AccessKeyId, tempAWSCreds.SecretAccessKey, tempAWSCreds.SessionToken)))
 	if err != nil {
@@ -196,7 +196,7 @@ func (repo *MapBoxTileServerRepo) uploadToMapboxTempS3(ctx context.Context, loca
 	}
 }
 
-func (repo *MapBoxTileServerRepo) uploadToMapbox(ctx context.Context, tempAWSCreds mapBoxTempCreds, accessToken string, username string, tilesetName string) (string, error) {
+func (repo *mapBoxTileServerRepo) uploadToMapbox(ctx context.Context, tempAWSCreds mapBoxTempCreds, accessToken string, username string, tilesetName string) (string, error) {
 	url := fmt.Sprintf("https://api.mapbox.com/uploads/v1/%s", username)
 
 	//  tileset: the name passed along to the frontend

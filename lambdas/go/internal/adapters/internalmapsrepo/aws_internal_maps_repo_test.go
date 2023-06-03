@@ -117,8 +117,7 @@ func TestAWSMapsRepo_List(t *testing.T) {
 			mockAWSClient.On("ListObjectsInS3", ctx, testBucketName).Return(testObjects, nil)
 			mockAWSClient.On("GetObjectMetadataInS3", ctx, testBucketName, mock.AnythingOfType("string"), testMetadataKey).Return(&testMetadata, nil)
 
-			repo := NewAWSInternalMapsRepository(ctx, mockLogger, testBucketName, testMetadataKey, "test-queue", "/tmp")
-			repo.awsClient = mockAWSClient
+			repo := NewAWSInternalMapsRepository(mockLogger, testBucketName, testMetadataKey, "test-queue", "/tmp", mockAWSClient)
 
 			maps, err := repo.List(ctx, tc.provider, tc.bounds, tc.mapType)
 			assert.Equal(t, tc.expectedError, err)
@@ -154,8 +153,7 @@ func TestAWSMapsRepo_Download(t *testing.T) {
 
 	mockAWSClient.On("GetFromS3", ctx, testBucketName, testKey).Return(testData, nil)
 
-	repo := NewAWSInternalMapsRepository(ctx, mockLogger, testBucketName, "test-metadata-key", "test-queue", "/tmp")
-	repo.awsClient = mockAWSClient
+	repo := NewAWSInternalMapsRepository(mockLogger, testBucketName, "test-metadata-key", "test-queue", "/tmp", mockAWSClient)
 
 	localMap, err := repo.Download(ctx, testMap)
 	assert.Nil(t, err)
@@ -189,8 +187,7 @@ func TestAWSMapsRepo_Create(t *testing.T) {
 
 	mockAWSClient.On("PublishMessageToSQS", ctx, testQueueName, &message).Return(nil)
 
-	repo := NewAWSInternalMapsRepository(ctx, mockLogger, "test-bucket", "test-metadata-key", testQueueName, "/tmp")
-	repo.awsClient = mockAWSClient
+	repo := NewAWSInternalMapsRepository(mockLogger, "test-bucket", "test-metadata-key", testQueueName, "/tmp", mockAWSClient)
 
 	err := repo.Create(ctx, testMap)
 	assert.NoError(t, err)
