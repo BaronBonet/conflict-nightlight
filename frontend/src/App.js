@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+import ReactGA from "react-ga4";
 import { TheMap } from './components/TheMap';
 import {CircularProgress, Grid} from '@mui/material';
 import ColorLegend from './components/ColorLegend'
 import * as d3 from 'd3';
 import FullScreenToggle from "./components/FullScreenToggle";
+import InfoIcon from '@mui/icons-material/Info';
 
 console.log(`version ${process.env.REACT_APP_VERSION}`);
+ReactGA.initialize(`${process.env.GOOGLE_TAG}`);
+ReactGA.send({hitType:"pageview", page: window.location.pathname});
 
 function App() {
     const [viewState, setViewState] = useState({
@@ -21,7 +25,8 @@ function App() {
     const [rightMap, setRightMap] = useState(null);
     const [mapOptions, setMapOptions] = useState([]);
 
-    const mapBorder = {'z-index': "0", border: "1px solid rgba(0, 0, 0, 1)"}
+    const mapBorder = {'zIndex': "0", border: "1px solid rgba(0, 0, 0, 1)"}
+
 
     useEffect(() => {
         const fetchMapOptions = async () => {
@@ -54,6 +59,9 @@ function App() {
 
     return (
         <div className="App">
+            <a href="https://ericcbonet.com/posts/conflict-nightlight/" target="_blank" rel="noopener noreferrer">
+                <InfoIcon style={{ position: 'absolute', top: '20px', left: '20px', color: 'white', zIndex: "100" }} />
+            </a>
             <Grid container columnSpacing={0} spacing={0}>
                 <Grid item xs={12} sm={6} style={mapBorder}>
                     <TheMap
