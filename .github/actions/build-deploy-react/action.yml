@@ -9,6 +9,10 @@ inputs:
     required: false
     type: string
     default: undefined
+  google-tag:
+    required: false
+    type: string
+    default: undefined
   version:
     required: false
     type: string
@@ -37,7 +41,7 @@ runs:
     - name: Build app
       shell: bash
       working-directory: frontend
-      run: REACT_APP_MAPBOX_TOKEN=${{ inputs.react-app-mapbox-token }} REACT_APP_VERSION=${{ inputs.version }} yarn build
+      run: REACT_APP_MAPBOX_TOKEN=${{ inputs.react-app-mapbox-token }} GOOGLE_TAG=${{ inputs.google-tag}} REACT_APP_VERSION=${{ inputs.version }} yarn build
 
     - name: Configure AWS
       if: ${{ inputs.deploy == 'true' }}
