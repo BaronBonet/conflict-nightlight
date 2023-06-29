@@ -5,14 +5,14 @@ from app.infrastructure.get_or_raise import get_or_raise
 
 
 def extract_lambda_request(event: str | dict[str, str]) -> tuple[dict[str, str], str]:
-    if type(event) == str:
+    if isinstance(event, str):
         event = ast.literal_eval(event)
     records = get_or_raise(event, "Records")
     if len(records) > 1:
         raise Exception("More than one record was provided.")
     record = records[0]
     request = get_or_raise(record, "body")
-    if type(request) == str:
+    if isinstance(request, str):
         request = ast.literal_eval(request)
     return request, _get_correlation_id(record)
 

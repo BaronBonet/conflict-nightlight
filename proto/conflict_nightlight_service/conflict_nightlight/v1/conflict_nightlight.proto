@@ -21,10 +21,11 @@ message Map {
   MapSource map_source = 4;
 }
 
+// Buf now supports google date field: https://buf.build/googleapis/googleapis/file/main:google/type/date.proto
 message Date {
-  int32 day = 1;
-  int32 month = 2;
-  int32 year = 3;
+  uint32 day = 1;
+  uint32 month = 2;
+  uint32 year = 3;
 }
 
 message MapSource {

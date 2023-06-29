@@ -6,6 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/BaronBonet/conflict-nightlight/internal/adapters/awsclient"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
@@ -14,10 +19,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/mitchellh/mapstructure"
-	"io"
-	"net/http"
-	"os"
-	"time"
 )
 
 type mapBoxTileServerRepo struct {
@@ -42,6 +43,9 @@ func NewMapboxTileServerRepo(ctx context.Context, logger ports.Logger, secretsKe
 	err = mapstructure.Decode(rawSecrets, &secrets)
 	if err != nil {
 		logger.Fatal(ctx, "Error when getting secrets from secrets manager", "secretKey", secretsKey, "error", err)
+	}
+	if secrets.MapboxPublicToken == "" || secrets.MapboxUsername == "" {
+		logger.Fatal(ctx, "Secrets were not filled", "secretKey", secretsKey)
 	}
 	return &mapBoxTileServerRepo{logger: logger, secrets: secrets, awsClient: awsClient}
 }

@@ -2,19 +2,20 @@ package prototransformers
 
 import (
 	"fmt"
-	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
-	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 	"regexp"
 	"strings"
 	"time"
+
+	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
+	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 )
 
 func DomainToProto(m domain.Map) conflict_nightlightv1.Map {
 	return conflict_nightlightv1.Map{
 		Date: &conflict_nightlightv1.Date{
-			Day:   int32(m.Date.Day),
-			Month: int32(m.Date.Month),
-			Year:  int32(m.Date.Year),
+			Day:   uint32(m.Date.Day),
+			Month: uint32(m.Date.Month),
+			Year:  uint32(m.Date.Year),
 		},
 		MapType: conflict_nightlightv1.MapType(conflict_nightlightv1.MapType_value[fmt.Sprintf(strings.ToUpper(camelToSnakeCase(m.MapType.String())))]),
 		Bounds:  conflict_nightlightv1.Bounds(conflict_nightlightv1.Bounds_value[fmt.Sprintf(strings.ToUpper(camelToSnakeCase(m.Bounds.String())))]),
