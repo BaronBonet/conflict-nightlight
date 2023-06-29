@@ -1,6 +1,8 @@
 import os
 import pathlib
 
+import betterproto
+
 from app.adapters.eogdata_external_map_repository import EogdataMapRepository
 from app.adapters.s3_bounds_repository import S3BoundsRepository
 from app.adapters.s3_internal_map_repository import S3InternalMapRepository, NewMessageNotificationQueue
@@ -11,15 +13,10 @@ from app.core.services.raw_processor import RawMapProcessorService
 from app.infrastructure.get_secrets_from_aws_secret_manager import get_secrets_from_aws_secrets_manager
 from app.infrastructure.proto_transformers import proto_map_to_domain
 from generated.conflict_nightlight.v1 import (
-    DownloadAndCropRawTifRequest,
     CreateMapProductRequest,
     PublishMapProductRequest,
     RequestWrapper,
 )
-
-
-def is_used(p: DownloadAndCropRawTifRequest | CreateMapProductRequest) -> bool:
-    return p.__dict__["_serialized_on_wire"]
 
 
 def handle_event(event: dict[str, str], correlation_id: str):
@@ -31,10 +28,9 @@ def handle_event(event: dict[str, str], correlation_id: str):
         correlation_id=correlation_id,
     )
     request = RequestWrapper().from_dict(event)
-    if is_used(request.download_and_crop_raw_tif_request):
+    if betterproto.serialized_on_wire(request.download_and_crop_raw_tif_request):
         download_and_crop_raw_tif(logger, request, correlation_id, write_dir)
-
-    elif is_used(request.create_map_product_request):
+    elif betterproto.serialized_on_wire(request.create_map_product_request):
         create_new_map_product(logger=logger, request=request, correlation_id=correlation_id, write_dir=write_dir)
     else:
         logger.fatal("unknown event", **event)

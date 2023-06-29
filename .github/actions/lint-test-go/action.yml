@@ -6,7 +6,6 @@ inputs:
     required: false
     default: lambdas/go
 
-
 runs:
   using: composite
   steps:

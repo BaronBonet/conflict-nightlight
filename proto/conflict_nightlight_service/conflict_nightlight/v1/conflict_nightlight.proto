@@ -22,9 +22,9 @@ message Map {
 }
 
 message Date {
-  int32 day = 1;
-  int32 month = 2;
-  int32 year = 3;
+  uint32 day = 1;
+  uint32 month = 2;
+  uint32 year = 3;
 }
 
 message MapSource {
