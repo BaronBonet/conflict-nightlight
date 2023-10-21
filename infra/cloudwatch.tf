@@ -47,7 +47,6 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
       1,
       2,
       3,
-      4,
       10,
       11,
       12

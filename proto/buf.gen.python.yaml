@@ -3,6 +3,6 @@ managed:
   enabled: true
 
 plugins:
-  - remote: buf.build/judahrand/plugins/python-betterproto
+  - plugin: buf.build/community/danielgtaylor-betterproto:v1.2.5
     out: lambdas/python/generated
     opt: paths=source_relative

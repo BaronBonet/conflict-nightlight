@@ -4,16 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"sort"
+	"strings"
+	"text/tabwriter"
+
 	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/urfave/cli/v2"
-	"os"
-	"sort"
-	"strings"
-	"text/tabwriter"
 )
 
 type CliHandler struct {
