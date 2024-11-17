@@ -28,7 +28,7 @@ class BoundsRepository(ABC):
     """Driven port defining the interface for our boundary files"""
 
     @abstractmethod
-    def download(self, key: str) -> pathlib.PosixPath:
+    def download(self, key: str) -> pathlib.PosixPath | None:
         """
         Downloads all shapefiles required
 

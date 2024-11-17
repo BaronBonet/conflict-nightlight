@@ -3,7 +3,6 @@ name: Go zip builder and deployer
 inputs:
   name:
     required: true
-    type: string
   aws-access-key-id:
     required: false
   aws-secret-access-key:
@@ -14,7 +13,7 @@ inputs:
   deploy:
     description: Whether to deploy the image to ECR since github actions don't have a boolean use 'true' or
     required: false
-    default: false
+    default: "false"
   s3-bucket-name:
     required: false
     default: conflict-nightlight-zip-deployables
@@ -25,7 +24,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/setup-go@v3
+    - uses: actions/setup-go@v5
       with:
         go-version-file: ${{ inputs.working-dir }}/go.mod
         cache-dependency-path: ${{ inputs.working-dir }}/go.mod
@@ -39,16 +38,9 @@ runs:
       with:
         github_token: ${{ github.token }}
 
-    - name: Create bin for mockery
+    - name: Install Dependencies
       shell: bash
-      run: |
-        mkdir -p "$PWD/bin"
-        echo "$PWD/bin" >> $GITHUB_PATH
-
-    - name: install mockery
-      shell: bash
-      run: |
-        tar -xz -C bin -f <(curl -Ls https://github.com/vektra/mockery/releases/download/v2.25.0/mockery_2.25.0_Linux_x86_64.tar.gz)
+      run: make dependencies-install-go
 
     - name: build go app
       shell: bash

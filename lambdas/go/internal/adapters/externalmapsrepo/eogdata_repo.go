@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
-	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
-	"github.com/gocolly/colly"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
+	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
+	"github.com/gocolly/colly"
 )
 
 type eogdataRepo struct {
@@ -102,6 +103,8 @@ func boundsToTileID(bounds domain.Bounds) (*EogdataTileId, error) {
 	switch bounds {
 	case domain.BoundsUkraineAndAround:
 		tileId = EOGDATATILEID_TILE2
+	case domain.BoundsGazaAndAround:
+		tileId = EOGDATATILEID_TILE2
 	default:
 		return nil, fmt.Errorf("unknown Bounds: %s", bounds)
 	}
@@ -127,7 +130,7 @@ func extractDateFromMonthlyLink(link string) (*domain.Date, error) {
 	if err != nil {
 		return nil, errors.New("Error while extracting the year. Error: " + err.Error())
 	}
-	month, _ := strconv.ParseInt(segments[7][4:6], 10, 32)
+	month, err := strconv.ParseInt(segments[7][4:6], 10, 32)
 	if err != nil {
 		return nil, errors.New("Error while extracting the month. Error: " + err.Error())
 	}

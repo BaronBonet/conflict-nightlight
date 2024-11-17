@@ -29,5 +29,6 @@ The secondary goals of this project are to:
   - mapboxPublicToken
   - mapboxUsername
 - There is a cli for interacting with the repositories commands can be found in `lambdas/go/internal/handlers/cli.go`, to use the CLI be sure to set your export your `AWS_PROFILE`.
+  - install the go dependencies with `make dependencies-install-go`
   - build the cli with `make build-cli`
   - example cli command:  `./map-controller deleteMap "{\"Date\":{\"Day\":1,\"Month\":4,\"Year\":2023}, \"MapType\":2,\"Bounds\":1}"`

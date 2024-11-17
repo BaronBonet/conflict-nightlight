@@ -1,7 +1,7 @@
 import datetime
 
 from app.core import domain
-from generated.conflict_nightlight.v1 import Map, Date, MapProvider, MapType, Bounds, MapSource
+from generated.conflict_nightlight.v1 import Bounds, Date, Map, MapProvider, MapSource, MapType
 
 
 def transform_map_domain_to_proto(m: domain.Map) -> Map:
@@ -33,6 +33,8 @@ def bounds_to_string(b: Bounds) -> str | None:
     match b:
         case Bounds.BOUNDS_UKRAINE_AND_AROUND:
             return "BoundsUkraineAndAround"
+        case Bounds.BOUNDS_GAZA_AND_AROUND:
+            return "BoundsGazaAndAround"
     return None
 
 

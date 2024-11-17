@@ -4,8 +4,8 @@ import geopandas as gpd
 import rasterio.mask
 from shapely.geometry import mapping
 
-from app.core import ports, domain
-from app.core.ports import ExternalMapRepository, InternalMapRepository, BoundsRepository
+from app.core import domain, ports
+from app.core.ports import BoundsRepository, ExternalMapRepository, InternalMapRepository
 
 
 class RawMapProcessorService:
@@ -29,7 +29,7 @@ class RawMapProcessorService:
 
     def _crop_raw_file(self, raw_map_file: pathlib.Path, boundary_file: pathlib.Path) -> pathlib.Path:
         self.logger.debug("Starting to crop file", raw_map_file=raw_map_file, boundary_file=boundary_file)
-        crop_boundaries = _get_crop_boundaries(boundary_file)
+        crop_boundaries = self._get_crop_boundaries(boundary_file)
 
         with rasterio.open(str(raw_map_file)) as raster_data:
             cropped_data, crop_data_afflin = rasterio.mask.mask(
@@ -59,16 +59,16 @@ class RawMapProcessorService:
             self.logger.debug("Sucessfully cropped file", out_file=out_file)
         return cropped_file_name
 
+    def _get_crop_boundaries(self, boundary_shp_file: pathlib.Path) -> dict:
+        """
+        Extract the crop boundaries from a shape file.
 
-def _get_crop_boundaries(boundary_shp_file: pathlib.Path) -> dict:
-    """
-    Extract the crop boundaries from a shape file.
+        Args:
+            boundary_shp_file (str): The path to the shape file containing the crop boundaries.
 
-    Args:
-        boundary_shp_file (str): The path to the shape file containing the crop boundaries.
-
-    Returns:
-        dict: A dictionary of coordinates representing the crop boundaries.
-    """
-    crop_extent = gpd.read_file(boundary_shp_file)
-    return mapping(crop_extent["geometry"][0])
+        Returns:
+            dict: A dictionary of coordinates representing the crop boundaries.
+        """
+        self.logger.debug("Extracting crop boundaries", boundary_shp_file=boundary_shp_file)
+        crop_extent = gpd.read_file(boundary_shp_file)
+        return mapping(crop_extent["geometry"][0])

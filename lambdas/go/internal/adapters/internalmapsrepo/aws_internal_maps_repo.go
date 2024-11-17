@@ -4,12 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
-	awsclient "github.com/BaronBonet/conflict-nightlight/internal/adapters/awsclient"
-	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
-	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
-	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
-	"github.com/google/uuid"
 	"os"
 	"path/filepath"
 	"sort"
@@ -17,14 +11,21 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
+	awsclient "github.com/BaronBonet/conflict-nightlight/internal/adapters/awsclient"
+	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
+	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
+	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
+	"github.com/google/uuid"
 )
 
 type AWSMapsRepo struct {
-	logger           ports.Logger
 	bucket           Bucket
+	logger           ports.Logger
+	awsClient        awsclient.AWSClient
 	messageQueueName string
 	tmpWriteDir      string
-	awsClient        awsclient.AWSClient
 }
 
 type Bucket struct {
@@ -32,7 +33,14 @@ type Bucket struct {
 	metadataKey string
 }
 
-func NewAWSInternalMapsRepository(logger ports.Logger, repoBucketName string, metadataKey string, persistRequestQueueName string, tmpWriteDir string, awsClient awsclient.AWSClient) ports.InternalMapRepo {
+func NewAWSInternalMapsRepository(
+	logger ports.Logger,
+	repoBucketName string,
+	metadataKey string,
+	persistRequestQueueName string,
+	tmpWriteDir string,
+	awsClient awsclient.AWSClient,
+) ports.InternalMapRepo {
 	return &AWSMapsRepo{logger: logger, bucket: Bucket{
 		bucketName:  repoBucketName,
 		metadataKey: metadataKey,
@@ -41,14 +49,19 @@ func NewAWSInternalMapsRepository(logger ports.Logger, repoBucketName string, me
 		awsClient:   awsClient}
 }
 
-func (repo *AWSMapsRepo) List(ctx context.Context, desiredProvider domain.MapProvider, desiredBounds domain.Bounds, desiredMapType domain.MapType) ([]domain.Map, error) {
+func (repo *AWSMapsRepo) List(
+	ctx context.Context,
+	desiredProvider domain.MapProvider,
+	desiredBounds domain.Bounds,
+	desiredMapType domain.MapType,
+) ([]domain.Map, error) {
 
 	objects, err := repo.awsClient.ListObjectsInS3(ctx, repo.bucket.bucketName)
 	if err != nil {
 		return nil, err
 	}
 	if objects == nil {
-		repo.logger.Warn(ctx, "There were no object found in the s3 bucket", "bucketName", repo.bucket.bucketName)
+		repo.logger.Warn(ctx, "There were no objects found in the s3 bucket", "bucketName", repo.bucket.bucketName)
 		return nil, nil
 	}
 
@@ -106,7 +119,9 @@ func (repo *AWSMapsRepo) Download(ctx context.Context, m domain.Map) (*domain.Lo
 //	TODO this needs to be implemented also for the processing step
 func (repo *AWSMapsRepo) Create(ctx context.Context, m domain.Map) error {
 	protoMap := prototransformers.DomainToProto(m)
-	message := conflict_nightlightv1.RequestWrapper_DownloadAndCropRawTifRequest{DownloadAndCropRawTifRequest: &conflict_nightlightv1.DownloadAndCropRawTifRequest{Map: &protoMap}}
+	message := conflict_nightlightv1.RequestWrapper_DownloadAndCropRawTifRequest{
+		DownloadAndCropRawTifRequest: &conflict_nightlightv1.DownloadAndCropRawTifRequest{Map: &protoMap},
+	}
 	err := repo.awsClient.PublishMessageToSQS(ctx, repo.messageQueueName, &message)
 	return err
 }
@@ -147,7 +162,15 @@ func extractDateFromKey(filePath string) (*domain.Date, error) {
 	}, nil
 }
 
-func processObjectKey(ctx context.Context, repo *AWSMapsRepo, objKey string, desiredProvider domain.MapProvider, desiredBounds domain.Bounds, desiredMapType domain.MapType, mapChan chan<- *domain.Map) {
+func processObjectKey(
+	ctx context.Context,
+	repo *AWSMapsRepo,
+	objKey string,
+	desiredProvider domain.MapProvider,
+	desiredBounds domain.Bounds,
+	desiredMapType domain.MapType,
+	mapChan chan<- *domain.Map,
+) {
 	directory := filepath.Dir(objKey)
 	extension := filepath.Ext(objKey)
 	if directory == "" || extension != ".tif" {
@@ -156,24 +179,58 @@ func processObjectKey(ctx context.Context, repo *AWSMapsRepo, objKey string, des
 	}
 	provider, bounds, mapType, err := convertStringPathToDomain(directory)
 	if err != nil {
-		repo.logger.Error(ctx, "There was an error when attempting to convert the objectKey to a domain object", "error", err.Error(), "objectKey", objKey)
+		repo.logger.Error(
+			ctx,
+			"There was an error when attempting to convert the objectKey to a domain object",
+			"error",
+			err.Error(),
+			"objectKey",
+			objKey,
+		)
 		return
 	}
 	if isDesiredObject(*provider, desiredProvider, *bounds, desiredBounds, *mapType, desiredMapType) {
 		date, err := extractDateFromKey(objKey)
 		if err != nil {
-			repo.logger.Error(ctx, "There was an error when attempting to extract the date from the objectKey", "error", err.Error(), "objectKey", objKey)
+			repo.logger.Error(
+				ctx,
+				"There was an error when attempting to extract the date from the objectKey",
+				"error",
+				err.Error(),
+				"objectKey",
+				objKey,
+			)
 			return
 		}
 
 		url, err := repo.awsClient.GetObjectMetadataInS3(ctx, repo.bucket.bucketName, objKey, repo.bucket.metadataKey)
 
 		if err != nil {
-			repo.logger.Error(ctx, "There was an error when attempting to get the metadata from the object", "error", err.Error(), "objectKey", objKey, "bucket", repo.bucket.bucketName, "metadataKey", repo.bucket.metadataKey)
+			repo.logger.Error(
+				ctx,
+				"There was an error when attempting to get the metadata from the object",
+				"error",
+				err.Error(),
+				"objectKey",
+				objKey,
+				"bucket",
+				repo.bucket.bucketName,
+				"metadataKey",
+				repo.bucket.metadataKey,
+			)
 			return
 		}
 		if url == nil {
-			repo.logger.Warn(ctx, "The url, that should be attached to the objects metadata was not found", "objectKey", objKey, "bucket", repo.bucket.bucketName, "metadataKey", repo.bucket.metadataKey)
+			repo.logger.Warn(
+				ctx,
+				"The url, that should be attached to the objects metadata was not found",
+				"objectKey",
+				objKey,
+				"bucket",
+				repo.bucket.bucketName,
+				"metadataKey",
+				repo.bucket.metadataKey,
+			)
 			u := ""
 			url = &u
 		}
@@ -192,7 +249,15 @@ func processObjectKey(ctx context.Context, repo *AWSMapsRepo, objKey string, des
 
 func createKeyFromMap(m domain.Map) string {
 	d := m.Date
-	s := fmt.Sprintf("%s/%s/%s/%d_%d_%d.tif", m.Source.MapProvider.String(), m.Bounds.String(), m.MapType.String(), d.Year, d.Month, d.Day)
+	s := fmt.Sprintf(
+		"%s/%s/%s/%d_%d_%d.tif",
+		m.Source.MapProvider.String(),
+		m.Bounds.String(),
+		m.MapType.String(),
+		d.Year,
+		d.Month,
+		d.Day,
+	)
 	return s
 }
 
@@ -208,7 +273,14 @@ func convertStringPathToDomain(objectKey string) (*domain.MapProvider, *domain.B
 	return &provider, &bounds, &mapType, nil
 }
 
-func isDesiredObject(provider domain.MapProvider, desiredProvider domain.MapProvider, bounds domain.Bounds, desiredBounds domain.Bounds, mapType domain.MapType, desiredMapType domain.MapType) bool {
+func isDesiredObject(
+	provider domain.MapProvider,
+	desiredProvider domain.MapProvider,
+	bounds domain.Bounds,
+	desiredBounds domain.Bounds,
+	mapType domain.MapType,
+	desiredMapType domain.MapType,
+) bool {
 	return (desiredProvider == domain.MapProviderUnspecified || provider == desiredProvider) &&
 		(desiredBounds == domain.BoundsUnspecified || bounds == desiredBounds) &&
 		(desiredMapType == domain.MapTypeUnspecified || mapType == desiredMapType)
