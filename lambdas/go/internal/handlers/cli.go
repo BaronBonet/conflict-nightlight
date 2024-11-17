@@ -42,9 +42,8 @@ func NewCLIHandler(ctx context.Context, productService ports.OrchestratorService
 					}
 					if c.String("json") == "true" {
 						return printMapsAsJson(maps)
-					} else {
-						return printMapsAsTable(maps)
 					}
+					return printMapsAsTable(maps)
 				},
 			},
 			{
@@ -57,9 +56,8 @@ func NewCLIHandler(ctx context.Context, productService ports.OrchestratorService
 					}
 					if c.String("json") == "true" {
 						return printMapsAsJson(maps)
-					} else {
-						return printMapsAsTable(maps)
 					}
+					return printMapsAsTable(maps)
 				},
 			},
 			{
@@ -114,7 +112,10 @@ func NewCLIHandler(ctx context.Context, productService ports.OrchestratorService
 					if err := jsonpb.Unmarshal(strings.NewReader(c.Args().Get(0)), &syncMapRequest); err != nil {
 						return err
 					}
-					_, err := productService.SyncInternalWithExternalMaps(ctx, prototransformers.ProtoToSyncMapsRequest(&syncMapRequest))
+					_, err := productService.SyncInternalWithExternalMaps(
+						ctx,
+						prototransformers.ProtoToSyncMapsRequest(&syncMapRequest),
+					)
 					if err != nil {
 						return err
 					}
@@ -177,7 +178,16 @@ func printMapsAsTable(maps []domain.Map) error {
 	for _, m := range maps {
 		mapTypeStr := m.MapType.String()
 		boundsStr := m.Bounds.String()
-		_, err := fmt.Fprintf(writer, "%d-%02d-%02d\t%s\t%s\t%s\n", m.Date.Year, m.Date.Month, m.Date.Day, mapTypeStr, boundsStr, m.Source.MapProvider.String())
+		_, err := fmt.Fprintf(
+			writer,
+			"%d-%02d-%02d\t%s\t%s\t%s\n",
+			m.Date.Year,
+			m.Date.Month,
+			m.Date.Day,
+			mapTypeStr,
+			boundsStr,
+			m.Source.MapProvider.String(),
+		)
 		if err != nil {
 			return err
 		}

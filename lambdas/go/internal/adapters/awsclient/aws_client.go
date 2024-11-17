@@ -27,7 +27,11 @@ type AWSClient interface {
 
 //go:generate mockery --name=SecretsManagerClientInterface
 type SecretsManagerClientInterface interface {
-	GetSecretValue(ctx context.Context, params *secretsmanager.GetSecretValueInput, optFns ...func(*secretsmanager.Options)) (*secretsmanager.GetSecretValueOutput, error)
+	GetSecretValue(
+		ctx context.Context,
+		params *secretsmanager.GetSecretValueInput,
+		optFns ...func(*secretsmanager.Options),
+	) (*secretsmanager.GetSecretValueOutput, error)
 }
 
 type awsClient struct {

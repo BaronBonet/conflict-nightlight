@@ -6,7 +6,7 @@ on:
       - main
 
 
-# TODO inject variables to go and react, for the file shared with the CDN
+      # TODO: inject variables to go and react, for the file shared with the CDN
 env:
   FRONTEND_MAP_OPTIONS_JSON: "conflict-nightlight-map-options"
 

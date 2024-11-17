@@ -5,22 +5,19 @@ import betterproto
 
 from app.adapters.eogdata_external_map_repository import EogdataMapRepository
 from app.adapters.s3_bounds_repository import S3BoundsRepository
-from app.adapters.s3_internal_map_repository import S3InternalMapRepository, NewMessageNotificationQueue
+from app.adapters.s3_internal_map_repository import NewMessageNotificationQueue, S3InternalMapRepository
 from app.adapters.struct_logger import StructLogger
 from app.core import ports
 from app.core.services.product import MapProductService
 from app.core.services.raw_processor import RawMapProcessorService
 from app.infrastructure.get_secrets_from_aws_secret_manager import get_secrets_from_aws_secrets_manager
 from app.infrastructure.proto_transformers import proto_map_to_domain
-from generated.conflict_nightlight.v1 import (
-    CreateMapProductRequest,
-    PublishMapProductRequest,
-    RequestWrapper,
-)
+from generated.conflict_nightlight.v1 import CreateMapProductRequest, PublishMapProductRequest, RequestWrapper
 
 
 def handle_event(event: dict[str, str], correlation_id: str):
     write_dir = pathlib.Path(os.getenv("LOCAL_WRITE_DIRECTORY", "/tmp"))
+    # TODO: Use hexalog
     logger = StructLogger(
         version=os.getenv("VERSION", "unknown"),
         use_debug=os.getenv("USE_DEBUG_LOGGER", "true") == "true",

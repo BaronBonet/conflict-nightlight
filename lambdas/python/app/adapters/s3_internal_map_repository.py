@@ -6,19 +6,15 @@ from typing import Optional, Type
 import boto3
 from botocore.exceptions import ClientError
 
-from app.core import ports, domain
+from app.core import domain, ports
 from app.core.ports import InternalMapRepository
 from app.infrastructure.proto_transformers import (
-    transform_map_domain_to_proto,
+    bounds_to_string,
     map_provider_to_string,
     map_type_to_string,
-    bounds_to_string,
+    transform_map_domain_to_proto,
 )
-from generated.conflict_nightlight.v1 import (
-    CreateMapProductRequest,
-    PublishMapProductRequest,
-    RequestWrapper,
-)
+from generated.conflict_nightlight.v1 import CreateMapProductRequest, PublishMapProductRequest, RequestWrapper
 
 
 @dataclass

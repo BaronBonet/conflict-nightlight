@@ -1,14 +1,14 @@
 from app.handlers.proto_event_handler import handle_event
 from app.infrastructure.extract_lambda_request import extract_lambda_request
 from generated.conflict_nightlight.v1 import (
-    DownloadAndCropRawTifRequest,
+    Bounds,
     CreateMapProductRequest,
-    Map,
     Date,
-    MapType,
+    DownloadAndCropRawTifRequest,
+    Map,
     MapProvider,
     MapSource,
-    Bounds,
+    MapType,
     RequestWrapper,
 )
 
@@ -24,7 +24,7 @@ example_message_download_and_crop = RequestWrapper(
                     "2021/202101/vcmcfg/SVDNB_npp_20210101-20210131_75N060W_vcmcfg_v10_c202102062300.tgz"
                 ),
             ),
-            bounds=Bounds.BOUNDS_UKRAINE_AND_AROUND,
+            bounds=Bounds.BOUNDS_GAZA_AND_AROUND,
         )
     )
 )
@@ -53,7 +53,7 @@ event = (
           "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
           "receiptHandle": "MessageReceiptHandle",
           "body":"""
-    + example_message_create_new_product.to_json()
+    + example_message_download_and_crop.to_json()
     + """
     , "attributes": {
         "ApproximateReceiveCount": "1",

@@ -1,13 +1,17 @@
 package domain
 
 import (
-	"github.com/go-playground/assert/v2"
 	"testing"
+
+	// TODO: Can't we use the standard library?
+	"github.com/go-playground/assert/v2"
 )
 
 func TestStringToBounds(t *testing.T) {
 	assert.Equal(t, StringToBounds("BoundsUkraineAndAround"), BoundsUkraineAndAround)
 	assert.Equal(t, StringToBounds("bounds_ukraine_and_around"), BoundsUkraineAndAround)
+	assert.Equal(t, StringToBounds("BoundsGazaAndAround"), BoundsGazaAndAround)
+	assert.Equal(t, StringToBounds("bounds_gaza_and_around"), BoundsGazaAndAround)
 	assert.Equal(t, StringToBounds("fake"), BoundsUnspecified)
 }
 

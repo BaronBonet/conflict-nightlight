@@ -2,7 +2,6 @@ import concurrent
 import pathlib
 from concurrent.futures import ThreadPoolExecutor  # noqa: F401
 
-
 import boto3
 
 from app.core import ports
@@ -22,7 +21,7 @@ class S3BoundsRepository(BoundsRepository):
         self.local_shape_file_dir = local_write_dir / "shp"
         self.local_shape_file_dir.mkdir(parents=True, exist_ok=True)
 
-    def download(self, key: str) -> pathlib.Path:
+    def download(self, key: str) -> pathlib.PosixPath | None:
         bucket_objects = self.client.list_objects(Bucket=self.bucket_name)
         if len(bucket_objects) <= 0:
             self.logger.fatal("There are not any shp files in the bucket", bucket_name=self.bucket_name)

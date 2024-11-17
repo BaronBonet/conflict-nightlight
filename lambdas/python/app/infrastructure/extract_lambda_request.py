@@ -1,10 +1,11 @@
 import ast
 import os
+from typing import Any
 
 from app.infrastructure.get_or_raise import get_or_raise
 
 
-def extract_lambda_request(event: str | dict[str, str]) -> tuple[dict[str, str], str]:
+def extract_lambda_request(event: str | dict[str, Any]) -> tuple[dict[str, str], str]:
     if isinstance(event, str):
         event = ast.literal_eval(event)
     records = get_or_raise(event, "Records")

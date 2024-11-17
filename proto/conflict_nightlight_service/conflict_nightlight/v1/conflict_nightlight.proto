@@ -47,6 +47,7 @@ enum MapType {
 enum Bounds {
   BOUNDS_UNSPECIFIED = 0;
   BOUNDS_UKRAINE_AND_AROUND = 1;
+  BOUNDS_GAZA_AND_AROUND = 2;
 }
 
 message RequestWrapper {

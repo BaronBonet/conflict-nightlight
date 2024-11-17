@@ -40,4 +40,5 @@ conflict-nightlight-map-options.json
 debugger
 .python-version
 
-TODO
+lambdas/go/.local/bin/*
+!lambdas/go/.local/bin/.gitkeep

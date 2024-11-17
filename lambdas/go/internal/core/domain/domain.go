@@ -2,16 +2,17 @@ package domain
 
 import (
 	"fmt"
-	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure"
 	"strings"
 	"time"
+
+	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure"
 )
 
 type Map struct {
+	Source  MapSource
 	Date    Date
 	MapType MapType
 	Bounds  Bounds
-	Source  MapSource
 }
 
 func (m *Map) String() string {
@@ -26,13 +27,13 @@ type LocalMap struct {
 }
 
 type PublishedMap struct {
-	Map Map
 	Url string
+	Map Map
 }
 
 type MapSource struct {
-	MapProvider MapProvider
 	URL         string
+	MapProvider MapProvider
 }
 
 type Date struct {
@@ -88,10 +89,11 @@ type Bounds int
 const (
 	BoundsUnspecified Bounds = iota
 	BoundsUkraineAndAround
+	BoundsGazaAndAround
 )
 
 func StringToBounds(s string) Bounds {
-	for i := BoundsUnspecified; i <= BoundsUkraineAndAround; i++ {
+	for i := BoundsUnspecified; i <= BoundsGazaAndAround; i++ {
 		if infrastructure.CleanStrings(i.String()) == infrastructure.CleanStrings(s) {
 			return i
 		}
@@ -105,7 +107,7 @@ type SelectedDates struct {
 }
 
 type SyncMapRequest struct {
-	Bounds        Bounds
-	MapType       MapType
 	SelectedDates SelectedDates
+	MapType       MapType
+	Bounds        Bounds
 }
