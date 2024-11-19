@@ -3,6 +3,9 @@ package frontendmapdatarepo
 import (
 	"bytes"
 	"context"
+	"reflect"
+	"testing"
+
 	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
 	"github.com/BaronBonet/conflict-nightlight/internal/adapters/awsclient"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
@@ -10,15 +13,19 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"reflect"
-	"testing"
+	"github.com/stretchr/testify/require"
 )
 
 func TestS3FrontendMapDataRepo_Update(t *testing.T) {
 	ctx := context.Background()
 	mockLogger := ports.NewMockLogger(t)
 	mockAWSClient := awsclient.NewMockAWSClient(t)
-	mapRepo := &s3FrontendMapDataRepo{logger: mockLogger, awsClient: mockAWSClient, bucketName: "test-bucket", objectKey: "test-key"}
+	mapRepo := &s3FrontendMapDataRepo{
+		logger:     mockLogger,
+		awsClient:  mockAWSClient,
+		bucketName: "test-bucket",
+		objectKey:  "test-key",
+	}
 
 	url := "mapbox://test-tileset"
 	testMap := domain.PublishedMap{Map: domain.Map{
@@ -43,16 +50,19 @@ func TestS3FrontendMapDataRepo_Update(t *testing.T) {
 	})
 
 	t.Run("JSON found in S3 bucket and updated", func(t *testing.T) {
-		existingJSON := `[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"}]`
-		expectedJSON := `[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"},{"display_name":"Feb 2023","url":"mapbox://test-tileset","key":"Daily-UkraineAnd_2023-2-1"}]`
+		// TODO: this test is failing with an unmarshal error
+		existingJSON := `[{"maps_options":[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"}], "bounds": 2}]`
+		expectedJSON := `[{"maps_options":[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"},{"display_name":"Feb 2023","url":"mapbox://test-tileset","key":"Daily-UkraineAnd_2023-2-1"}], "bounds": 2}]`
 
 		mockAWSClient.On("GetFromS3", ctx, "test-bucket", "test-key").Return([]byte(existingJSON), nil)
-		mockAWSClient.On("UploadToS3", ctx, "test-bucket", "test-key", mock.AnythingOfType("*bytes.Reader")).Run(func(args mock.Arguments) {
-			body := args.Get(3).(*bytes.Reader)
-			buf := new(bytes.Buffer)
-			buf.ReadFrom(body)
-			assert.JSONEq(t, expectedJSON, buf.String())
-		}).Return(nil)
+		mockAWSClient.On("UploadToS3", ctx, "test-bucket", "test-key", mock.AnythingOfType("*bytes.Reader")).
+			Run(func(args mock.Arguments) {
+				body := args.Get(3).(*bytes.Reader)
+				buf := new(bytes.Buffer)
+				buf.ReadFrom(body)
+				assert.JSONEq(t, expectedJSON, buf.String())
+			}).
+			Return(nil)
 
 		mapRepo.Upsert(ctx, testMap)
 
@@ -64,7 +74,12 @@ func TestS3FrontendMapDataRepo_Delete(t *testing.T) {
 	ctx := context.Background()
 	mockLogger := ports.NewMockLogger(t)
 	mockAWSClient := awsclient.NewMockAWSClient(t)
-	mapRepo := &s3FrontendMapDataRepo{logger: mockLogger, awsClient: mockAWSClient, bucketName: "test-bucket", objectKey: "test-key"}
+	mapRepo := &s3FrontendMapDataRepo{
+		logger:     mockLogger,
+		awsClient:  mockAWSClient,
+		bucketName: "test-bucket",
+		objectKey:  "test-key",
+	}
 
 	testMap := domain.Map{
 		Date:    domain.Date{Day: 1, Month: 2, Year: 2023},
@@ -77,31 +92,33 @@ func TestS3FrontendMapDataRepo_Delete(t *testing.T) {
 	}
 
 	t.Run("JSON found in S3 bucket and map deleted", func(t *testing.T) {
-		existingJSON := `[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"},{"display_name":"Feb 2023","url":"mapbox://test-tileset","key":"Daily-UkraineAnd_2023-2-1"}]`
-		expectedJSON := `[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"}]`
+		existingJSON := `[{"maps_options":[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"},{"display_name":"Feb 2023","url":"mapbox://test-tileset","key":"Daily-UkraineAnd_2023-2-1"}], "bounds": 2}]`
+		expectedJSON := `[{"maps_options":[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"}], "bounds": 2}]`
 
 		mockAWSClient.On("GetFromS3", ctx, "test-bucket", "test-key").Return([]byte(existingJSON), nil)
-		mockAWSClient.On("UploadToS3", ctx, "test-bucket", "test-key", mock.AnythingOfType("*bytes.Reader")).Run(func(args mock.Arguments) {
-			body := args.Get(3).(*bytes.Reader)
-			buf := new(bytes.Buffer)
-			buf.ReadFrom(body)
-			assert.JSONEq(t, expectedJSON, buf.String())
-		}).Return(nil)
+		mockAWSClient.On("UploadToS3", ctx, "test-bucket", "test-key", mock.AnythingOfType("*bytes.Reader")).
+			Run(func(args mock.Arguments) {
+				body := args.Get(3).(*bytes.Reader)
+				buf := new(bytes.Buffer)
+				buf.ReadFrom(body)
+				assert.JSONEq(t, expectedJSON, buf.String())
+			}).
+			Return(nil)
 
 		err := mapRepo.Delete(ctx, testMap)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		mockAWSClient.AssertExpectations(t)
 	})
 
 	t.Run("JSON found in S3 bucket but map not found", func(t *testing.T) {
-		existingJSON := `[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"}]`
+		existingJSON := `[{"maps_options":[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"}], "bounds": 2}]`
 
 		mockAWSClient.On("GetFromS3", ctx, "test-bucket", "test-key").Return([]byte(existingJSON), nil)
-		mockAWSClient.AssertNotCalled(t, "UploadToS3")
 
 		err := mapRepo.Delete(ctx, testMap)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		mockAWSClient.AssertExpectations(t)
+		mockLogger.AssertExpectations(t)
 	})
 }
 
@@ -109,9 +126,14 @@ func TestS3FrontendMapDataRepo_List(t *testing.T) {
 	ctx := context.Background()
 	mockLogger := ports.NewMockLogger(t)
 	mockAWSClient := awsclient.NewMockAWSClient(t)
-	mapRepo := &s3FrontendMapDataRepo{logger: mockLogger, awsClient: mockAWSClient, bucketName: "test-bucket", objectKey: "test-key"}
+	mapRepo := &s3FrontendMapDataRepo{
+		logger:     mockLogger,
+		awsClient:  mockAWSClient,
+		bucketName: "test-bucket",
+		objectKey:  "test-key",
+	}
 
-	mapOptionsJSON := `[{
+	mapOptionsJSON := `[{"maps_options": [{
     "display_name": "Jan 2021",
     "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2021-1-1",
     "key": "Monthly-UkraineAnd_2021-1-1",
@@ -146,13 +168,14 @@ func TestS3FrontendMapDataRepo_List(t *testing.T) {
         "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2021/202102/vcmcfg/SVDNB_npp_20210201-20210228_75N060W_vcmcfg_v10_c202103091200.tgz"
       }
     }
-  }]`
+  }], "bounds": 1}]`
 
 	t.Run("List maps from S3 bucket", func(t *testing.T) {
 		mockAWSClient.On("GetFromS3", ctx, "test-bucket", "test-key").Return([]byte(mapOptionsJSON), nil)
+		mockLogger.On("Debug", ctx, "Found bounded map", "bounds", conflict_nightlightv1.Bounds(1)).Return()
 
 		maps, err := mapRepo.List(ctx)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		expectedMaps := []domain.PublishedMap{{
 			Map: domain.Map{Date: domain.Date{
@@ -188,7 +211,11 @@ func TestS3FrontendMapDataRepo_updateMapOptionsList(t *testing.T) {
 				{DisplayName: "Jan 2021", Url: "mapbox://example1", Key: "Monthly-UkraineAnd_2021-1-1"},
 				{DisplayName: "Feb 2021", Url: "mapbox://example2", Key: "Monthly-UkraineAnd_2021-2-1"},
 			},
-			newOption: conflict_nightlightv1.MapOptions{DisplayName: "Mar 2021", Url: "mapbox://example3", Key: "Monthly-UkraineAnd_2021-3-1"},
+			newOption: conflict_nightlightv1.MapOptions{
+				DisplayName: "Mar 2021",
+				Url:         "mapbox://example3",
+				Key:         "Monthly-UkraineAnd_2021-3-1",
+			},
 			expected: []*conflict_nightlightv1.MapOptions{
 				{DisplayName: "Jan 2021", Url: "mapbox://example1", Key: "Monthly-UkraineAnd_2021-1-1"},
 				{DisplayName: "Feb 2021", Url: "mapbox://example2", Key: "Monthly-UkraineAnd_2021-2-1"},
@@ -201,7 +228,11 @@ func TestS3FrontendMapDataRepo_updateMapOptionsList(t *testing.T) {
 				{DisplayName: "Jan 2021", Url: "mapbox://example1", Key: "Monthly-UkraineAnd_2021-1-1"},
 				{DisplayName: "Feb 2021", Url: "mapbox://example2", Key: "Monthly-UkraineAnd_2021-2-1"},
 			},
-			newOption: conflict_nightlightv1.MapOptions{DisplayName: "Feb 2021", Url: "mapbox://example3", Key: "Monthly-UkraineAnd_2021-2-1"},
+			newOption: conflict_nightlightv1.MapOptions{
+				DisplayName: "Feb 2021",
+				Url:         "mapbox://example3",
+				Key:         "Monthly-UkraineAnd_2021-2-1",
+			},
 			expected: []*conflict_nightlightv1.MapOptions{
 				{DisplayName: "Jan 2021", Url: "mapbox://example1", Key: "Monthly-UkraineAnd_2021-1-1"},
 				{DisplayName: "Feb 2021", Url: "mapbox://example3", Key: "Monthly-UkraineAnd_2021-2-1"},
@@ -213,7 +244,11 @@ func TestS3FrontendMapDataRepo_updateMapOptionsList(t *testing.T) {
 				{DisplayName: "Jan 2021", Url: "mapbox://example1", Key: "Monthly-UkraineAnd_2021-1-1"},
 				{DisplayName: "Mar 2021", Url: "mapbox://example3", Key: "Monthly-UkraineAnd_2021-3-1"},
 			},
-			newOption: conflict_nightlightv1.MapOptions{DisplayName: "Feb 2021", Url: "mapbox://example2", Key: "Monthly-UkraineAnd_2021-2-1"},
+			newOption: conflict_nightlightv1.MapOptions{
+				DisplayName: "Feb 2021",
+				Url:         "mapbox://example2",
+				Key:         "Monthly-UkraineAnd_2021-2-1",
+			},
 			expected: []*conflict_nightlightv1.MapOptions{
 				{DisplayName: "Jan 2021", Url: "mapbox://example1", Key: "Monthly-UkraineAnd_2021-1-1"},
 				{DisplayName: "Feb 2021", Url: "mapbox://example2", Key: "Monthly-UkraineAnd_2021-2-1"},
@@ -231,3 +266,13 @@ func TestS3FrontendMapDataRepo_updateMapOptionsList(t *testing.T) {
 		})
 	}
 }
+
+// TODO: implement this test
+// func TestS3FrontendMapDataRepo_updateBoundedMapOptions(t *testing.T) {
+// 	testCases := []*struct {
+// 		name           string
+// 		mapOptionsList []*conflict_nightlightv1.MapOptions
+// 		newOption      conflict_nightlightv1.MapOptions
+// 		expected       []*conflict_nightlightv1.MapOptions
+// 	}{}
+// }

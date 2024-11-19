@@ -18,15 +18,13 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v3
-
     - name: Install python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ inputs.python-version }}
 
     - name: Load cached poetry
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.local/
         key: poetry-cache-${{ steps.setup-python.outputs.python-version }}-${{ inputs.poetry-version }}
@@ -44,7 +42,7 @@ runs:
 
     - name: Load cached virtualenv
       id: cached-dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: .venv
         key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles(format('{0}/poetry.lock', inputs.poetry-version)) }}
@@ -56,6 +54,7 @@ runs:
       run: poetry install --no-interaction --no-root --sync
       shell: bash
 
+    # TODO: replace all of this with ruff
     - name: Run black
       working-directory: ${{ inputs.working-directory }}
       run: poetry run black --config pyproject.toml --check .

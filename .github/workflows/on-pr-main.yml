@@ -46,11 +46,11 @@ jobs:
           name: ${{ matrix.name }}
 
   react-builder:
-     name: Build react
-     runs-on: ubuntu-latest
-     steps:
-       - uses: actions/checkout@v4
-       - uses: ./.github/actions/build-deploy-react
+    name: Build react
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build-deploy-react
 
   proto-linter:
     name: Lint proto

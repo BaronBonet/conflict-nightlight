@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"os"
 	"sort"
-	"strings"
+	"sync"
 	"text/tabwriter"
 
 	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure/prototransformers"
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/urfave/cli/v2"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type CliHandler struct {
@@ -49,6 +49,11 @@ func NewCLIHandler(ctx context.Context, productService ports.OrchestratorService
 			{
 				Name:  "listProcessedMaps",
 				Usage: "List all processed maps",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name: "json",
+					},
+				},
 				Action: func(c *cli.Context) error {
 					maps, err := productService.ListProcessedInternalMaps(ctx)
 					if err != nil {
@@ -73,7 +78,7 @@ func NewCLIHandler(ctx context.Context, productService ports.OrchestratorService
 			},
 			{
 				Name:      "publishMap",
-				Usage:     "publish a map, pass in a map that is copied from the output of listProcessedMaps",
+				Usage:     "publish a map, pass in a map that is copied from the output of listProcessedMaps --json, i.e. you need to use the json flag and copy the whole object you want to publish.",
 				ArgsUsage: "[map]",
 				Action: func(c *cli.Context) error {
 					m, err := getMapFromArgs(c)
@@ -83,6 +88,52 @@ func NewCLIHandler(ctx context.Context, productService ports.OrchestratorService
 					if err := productService.PublishMap(ctx, m); err != nil {
 						return err
 					}
+					return nil
+				},
+			},
+			{
+				Name:      "publishMaps",
+				Usage:     "publish a list of maps, pass in an array of maps that is copied from the output of listProcessedMaps --json, i.e. you need to use the json flag and copy all the objects you want to publish and wrap them in brackets [].",
+				ArgsUsage: "[maps]",
+				Action: func(c *cli.Context) error {
+					maps, err := getMapsFromArgs(c)
+					if err != nil {
+						return err
+					}
+
+					errChan := make(chan error, len(maps))
+					var wg sync.WaitGroup
+
+					for _, m := range maps {
+						wg.Add(1)
+						go func(m domain.Map) {
+							defer wg.Done()
+							if err := productService.PublishMap(ctx, m); err != nil {
+								errChan <- fmt.Errorf("failed to publish map %v: %w", m, err)
+							}
+						}(m)
+					}
+
+					wg.Wait()
+					close(errChan)
+
+					var errors []error
+					for err := range errChan {
+						if err != nil {
+							errors = append(errors, err)
+						}
+					}
+
+					if len(errors) > 0 {
+						// Combine all errors into a single error message
+						errorMsg := fmt.Sprintf("Failed to publish some maps (%d errors):\n", len(errors))
+						for i, err := range errors {
+							errorMsg += fmt.Sprintf("Error %d: %v\n", i+1, err)
+						}
+						return fmt.Errorf(errorMsg)
+					}
+
+					fmt.Printf("Successfully published %d maps\n", len(maps))
 					return nil
 				},
 			},
@@ -99,17 +150,16 @@ func NewCLIHandler(ctx context.Context, productService ports.OrchestratorService
 					return nil
 				},
 			},
-
 			{
 				Name:      "invokeFullPipeline",
-				Usage:     "Runs the sync map request with will subsequently put messages on sqs and invoke the entire pipeline",
+				Usage:     "Runs the sync map request which will subsequently put messages on sqs and invoke the entire pipeline",
 				ArgsUsage: "[syncMapRequest]",
 				Action: func(c *cli.Context) error {
 					if c.NArg() < 1 {
 						return fmt.Errorf("the syncMapRequest argument is required")
 					}
 					syncMapRequest := conflict_nightlightv1.SyncMapRequest{}
-					if err := jsonpb.Unmarshal(strings.NewReader(c.Args().Get(0)), &syncMapRequest); err != nil {
+					if err := protojson.Unmarshal([]byte(c.Args().Get(0)), &syncMapRequest); err != nil {
 						return err
 					}
 					_, err := productService.SyncInternalWithExternalMaps(
@@ -131,6 +181,16 @@ func NewCLIHandler(ctx context.Context, productService ports.OrchestratorService
 func (h *CliHandler) Run(args []string) error {
 	return h.app.Run(args)
 }
+func getMapsFromArgs(c *cli.Context) ([]domain.Map, error) {
+	if c.NArg() < 1 {
+		return nil, fmt.Errorf("the maps argument is required")
+	}
+	var maps []domain.Map
+	if err := json.Unmarshal([]byte(c.Args().Get(0)), &maps); err != nil {
+		return nil, fmt.Errorf("failed to parse maps json: %w", err)
+	}
+	return maps, nil
+}
 
 func getMapFromArgs(c *cli.Context) (domain.Map, error) {
 	if c.NArg() < 1 {
@@ -143,28 +203,21 @@ func getMapFromArgs(c *cli.Context) (domain.Map, error) {
 	return m, nil
 }
 
-func printMapsAsJson(maps []domain.Map) error {
-	for _, m := range maps {
-		jsonData, err := json.MarshalIndent(m, "", "  ")
-		if err != nil {
-			return err
-		}
-		fmt.Println(string(jsonData))
-		fmt.Println()
+func printSliceAsJson[T any](items []T) error {
+	jsonData, err := json.MarshalIndent(items, "", "  ")
+	if err != nil {
+		return err
 	}
+	fmt.Println(string(jsonData))
 	return nil
 }
 
+func printMapsAsJson(maps []domain.Map) error {
+	return printSliceAsJson(maps)
+}
+
 func printPublishedMapsToTerminal(maps []domain.PublishedMap) error {
-	for _, m := range maps {
-		jsonData, err := json.MarshalIndent(m, "", "  ")
-		if err != nil {
-			return err
-		}
-		fmt.Println(string(jsonData))
-		fmt.Println()
-	}
-	return nil
+	return printSliceAsJson(maps)
 }
 
 func printMapsAsTable(maps []domain.Map) error {

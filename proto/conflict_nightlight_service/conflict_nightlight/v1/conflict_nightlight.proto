@@ -65,6 +65,11 @@ message MapOptions {
   Map map = 4;
 }
 
+message BoundedMapOptions {
+  repeated MapOptions maps_options = 1;
+  Bounds bounds = 2;
+}
+
 message SyncMapRequest {
   Bounds bounds = 1;
   MapType map_type = 2;

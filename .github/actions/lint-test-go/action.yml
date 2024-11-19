@@ -17,30 +17,15 @@ runs:
         cache-dependency-path: ${{ inputs.working-dir }}/go.mod
         cache: true
 
-    - name: Set path
-      shell: bash
-      run: |
-         mkdir -p "$PWD/bin"
-         echo "$PWD/bin" >> $GITHUB_PATH
-
     - name: Install buf
       # TODO: checkout the new buf action: https://github.com/bufbuild/buf-action
       uses: bufbuild/buf-setup-action@v1
       with:
         github_token: ${{ github.token }}
 
-    # TODO: Get these from the dependency versions
     - name: Install Dependencies
       shell: bash
       run: make dependencies-install-go
-    # - name: Install stringer
-    #   shell: bash
-    #   run: go install golang.org/x/tools/cmd/stringer@v0.27.0
-    #
-    # - name: install mockery
-    #   shell: bash
-    #   run: |
-    #     tar -xz -C bin -f <(curl -Ls https://github.com/vektra/mockery/releases/download/v2.25.0/mockery_2.25.0_Linux_x86_64.tar.gz)
 
     - name: generate proto stubs
       shell: bash
@@ -55,6 +40,11 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-dir }}
       run: go vet ./...
+
+    # - name: golangci-lint
+    #   uses: golangci/golangci-lint-action@v6
+    #   with:
+    #     version: v1.60
 
     - name: Run Staticcheck
       uses: dominikh/staticcheck-action@v1.3.1
