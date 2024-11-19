@@ -98,7 +98,7 @@ resource "aws_lambda_function" "conflict_nightlight_map_publisher_lambda_functio
   environment {
     variables = {
       WRITE_DIR                 = "/tmp"
-      FRONTEND_MAP_OPTIONS_JSON = "conflict-nightlight-map-options.json"
+      FRONTEND_MAP_OPTIONS_JSON = "conflict-nightlight-bounded-map-options.json"
       PROCESSED_TIF_BUCKET_NAME = aws_s3_bucket.processed_tif.bucket
       CORRELATION_ID_KEY        = var.correlation_id_key
       SOURCE_KEY_URL            = var.source_url_key

@@ -42,3 +42,4 @@ debugger
 
 lambdas/go/.local/bin/*
 !lambdas/go/.local/bin/.gitkeep
+.op

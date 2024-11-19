@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+
 	conflict_nightlightv1 "github.com/BaronBonet/conflict-nightlight/generated/conflict_nightlight/v1"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure"
@@ -13,12 +14,19 @@ type MapControllerLambdaEventHandler struct {
 	srv    ports.OrchestratorService
 }
 
-func NewMapControllerLambdaHandler(logger ports.Logger, srv ports.OrchestratorService) *MapControllerLambdaEventHandler {
+func NewMapControllerLambdaHandler(
+	logger ports.Logger,
+	srv ports.OrchestratorService,
+) *MapControllerLambdaEventHandler {
 	return &MapControllerLambdaEventHandler{logger: logger, srv: srv}
 }
 
-func (handler *MapControllerLambdaEventHandler) HandleEvent(_ context.Context, request *conflict_nightlightv1.SyncMapRequest) {
+func (handler *MapControllerLambdaEventHandler) HandleEvent(
+	_ context.Context,
+	request *conflict_nightlightv1.SyncMapRequest,
+) {
 	ctx := infrastructure.NewContext()
+	handler.logger.Info(ctx, "Syncing internal with external maps", "request", request.String())
 
 	if request.Bounds == conflict_nightlightv1.Bounds_BOUNDS_UNSPECIFIED {
 		handler.logger.Fatal(ctx, "Bounds cannot be unspecified")

@@ -73,6 +73,7 @@ runs:
         build-args: |
           VERSION=${{ inputs.image-tag }}
         platforms: linux/amd64
+        provenance:  false
         tags: |
           ${{ steps.set-docker-image-tag.outputs.docker-image-tag }}
           ${{ steps.set-docker-image-tag.outputs.docker-image-tag-latest }}

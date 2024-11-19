@@ -39,6 +39,9 @@ func NewMapboxTileServerRepo(ctx context.Context, logger ports.Logger, secretsKe
 	}
 	awsClient := awsclient.NewAWSClient(cfg)
 	rawSecrets, err := awsClient.GetSecretFromSecretsManager(ctx, secretsKey)
+	if err != nil {
+		logger.Fatal(ctx, "Error when getting secrets from secrets manager", "secretKey", secretsKey, "error", err)
+	}
 	var secrets mapboxSecrets
 	err = mapstructure.Decode(rawSecrets, &secrets)
 	if err != nil {
@@ -62,7 +65,13 @@ func (repo *mapBoxTileServerRepo) Publish(ctx context.Context, m domain.LocalMap
 	}
 	repo.uploadToMapboxTempS3(ctx, m.Filepath, *tempCreds)
 	repo.logger.Debug(ctx, "Uploaded to mapbox's temp s3 succeeded, attempting to notify mapbox.")
-	tileset, err := repo.uploadToMapbox(ctx, *tempCreds, repo.secrets.MapboxPublicToken, repo.secrets.MapboxUsername, m.Map.String())
+	tileset, err := repo.uploadToMapbox(
+		ctx,
+		*tempCreds,
+		repo.secrets.MapboxPublicToken,
+		repo.secrets.MapboxUsername,
+		m.Map.String(),
+	)
 	if err != nil {
 		repo.logger.Error(ctx, "Error when uploading to mapbox", "error", err)
 		return nil, err
@@ -96,12 +105,24 @@ func (repo *mapBoxTileServerRepo) Delete(ctx context.Context, m domain.Map) erro
 
 	defer func(Body io.ReadCloser) {
 		if err := Body.Close(); err != nil {
-			repo.logger.Error(ctx, "There was an error when trying to close the response body from the mapbox api", "error", err)
+			repo.logger.Error(
+				ctx,
+				"There was an error when trying to close the response body from the mapbox api",
+				"error",
+				err,
+			)
 		}
 	}(resp.Body)
 
 	if resp.StatusCode != 200 {
-		repo.logger.Error(ctx, "Deleting the tileset via the Mapbox API resulted in an unexpected http status code", "statusCode", resp.StatusCode, "responseBody", resp.Body)
+		repo.logger.Error(
+			ctx,
+			"Deleting the tileset via the Mapbox API resulted in an unexpected http status code",
+			"statusCode",
+			resp.StatusCode,
+			"responseBody",
+			resp.Body,
+		)
 		return errors.New("unexpected http status code was returned from Mapbox API")
 	}
 	return nil
@@ -128,7 +149,11 @@ type uploadStatus struct {
 	Progress int       `json:"progress"`
 }
 
-func (repo *mapBoxTileServerRepo) getMapboxTempCreds(ctx context.Context, username string, token string) (*mapBoxTempCreds, error) {
+func (repo *mapBoxTileServerRepo) getMapboxTempCreds(
+	ctx context.Context,
+	username string,
+	token string,
+) (*mapBoxTempCreds, error) {
 	url := fmt.Sprintf("https://api.mapbox.com/uploads/v1/%s/credentials?access_token=%s", username, token)
 	req, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -169,11 +194,29 @@ func (repo *mapBoxTileServerRepo) getMapboxTempCreds(ctx context.Context, userna
 	return &tempCreds, nil
 }
 
-func (repo *mapBoxTileServerRepo) uploadToMapboxTempS3(ctx context.Context, localFilepath string, tempAWSCreds mapBoxTempCreds) {
+func (repo *mapBoxTileServerRepo) uploadToMapboxTempS3(
+	ctx context.Context,
+	localFilepath string,
+	tempAWSCreds mapBoxTempCreds,
+) {
 	repo.logger.Debug(ctx, "Uploading tif to Mapbox's temp s3 bucket", "localFilepath", localFilepath)
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(tempAWSCreds.AccessKeyId, tempAWSCreds.SecretAccessKey, tempAWSCreds.SessionToken)))
+	cfg, err := config.LoadDefaultConfig(
+		ctx,
+		config.WithCredentialsProvider(
+			credentials.NewStaticCredentialsProvider(
+				tempAWSCreds.AccessKeyId,
+				tempAWSCreds.SecretAccessKey,
+				tempAWSCreds.SessionToken,
+			),
+		),
+	)
 	if err != nil {
-		repo.logger.Fatal(ctx, "There was an error when attempting to create a config from the temp mapbox credentials.", "error", err)
+		repo.logger.Fatal(
+			ctx,
+			"There was an error when attempting to create a config from the temp mapbox credentials.",
+			"error",
+			err,
+		)
 	}
 	cfg.Region = "us-east-1"
 
@@ -181,7 +224,14 @@ func (repo *mapBoxTileServerRepo) uploadToMapboxTempS3(ctx context.Context, loca
 
 	file, err := os.Open(localFilepath)
 	if err != nil {
-		repo.logger.Fatal(ctx, "Error when attempting to open the file to upload to mapbox", "file to upload", localFilepath, "error", err)
+		repo.logger.Fatal(
+			ctx,
+			"Error when attempting to open the file to upload to mapbox",
+			"file to upload",
+			localFilepath,
+			"error",
+			err,
+		)
 	}
 
 	defer func(file *os.File) {
@@ -196,11 +246,22 @@ func (repo *mapBoxTileServerRepo) uploadToMapboxTempS3(ctx context.Context, loca
 		Key:    aws.String(tempAWSCreds.Key),
 		Body:   file,
 	}); err != nil {
-		repo.logger.Fatal(ctx, "There was an error when attempting to upload the file to mapbox's s3 bucket.", "error", err)
+		repo.logger.Fatal(
+			ctx,
+			"There was an error when attempting to upload the file to mapbox's s3 bucket.",
+			"error",
+			err,
+		)
 	}
 }
 
-func (repo *mapBoxTileServerRepo) uploadToMapbox(ctx context.Context, tempAWSCreds mapBoxTempCreds, accessToken string, username string, tilesetName string) (string, error) {
+func (repo *mapBoxTileServerRepo) uploadToMapbox(
+	ctx context.Context,
+	tempAWSCreds mapBoxTempCreds,
+	accessToken string,
+	username string,
+	tilesetName string,
+) (string, error) {
 	url := fmt.Sprintf("https://api.mapbox.com/uploads/v1/%s", username)
 
 	//  tileset: the name passed along to the frontend
@@ -237,12 +298,22 @@ func (repo *mapBoxTileServerRepo) uploadToMapbox(ctx context.Context, tempAWSCre
 	}
 	defer func(Body io.ReadCloser) {
 		if err := Body.Close(); err != nil {
-			repo.logger.Error(ctx, "There was an error when trying to close the response body from the mapbox api", "error", err)
+			repo.logger.Error(
+				ctx,
+				"There was an error when trying to close the response body from the mapbox api",
+				"error",
+				err,
+			)
 		}
 	}(resp.Body)
 
 	if resp.StatusCode != 201 {
-		repo.logger.Error(ctx, "Uploading the tif file via the mapbox api resulted in an unexpected http status code", "statusCode", resp.StatusCode)
+		repo.logger.Error(
+			ctx,
+			"Uploading the tif file via the mapbox api resulted in an unexpected http status code",
+			"statusCode",
+			resp.StatusCode,
+		)
 		return "", errors.New("unexpected http status code was returned from mapbox api")
 	}
 	var uploadStatus uploadStatus

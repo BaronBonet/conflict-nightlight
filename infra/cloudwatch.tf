@@ -37,7 +37,7 @@ resource "aws_cloudwatch_event_rule" "map_controller_schedule" {
   schedule_expression = "cron(0 0 * * ? *)" # Trigger at midnight UTC every day
 }
 
-resource "aws_cloudwatch_event_target" "lambda_target" {
+resource "aws_cloudwatch_event_target" "lambda_target_ukraine" {
   rule = aws_cloudwatch_event_rule.map_controller_schedule.name
   arn  = aws_lambda_function.conflict_nightlight_map_controller_lambda_function.arn
   input = jsonencode({
@@ -47,6 +47,7 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
       1,
       2,
       3,
+      4,
       10,
       11,
       12
@@ -55,7 +56,36 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
       2021,
       2022,
       2023,
-      2024
+      2024,
+      2025
+    ]
+  })
+}
+
+resource "aws_cloudwatch_event_target" "lambda_target_gaza" {
+  rule = aws_cloudwatch_event_rule.map_controller_schedule.name
+  arn  = aws_lambda_function.conflict_nightlight_map_controller_lambda_function.arn
+  input = jsonencode({
+    "bounds" : 1,
+    "map_type" : 2,
+    "selected_months" : [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "selected_years" : [
+      2023,
+      2024,
+      2025
     ]
   })
 }
