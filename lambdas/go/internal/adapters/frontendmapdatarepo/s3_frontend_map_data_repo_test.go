@@ -50,7 +50,6 @@ func TestS3FrontendMapDataRepo_Update(t *testing.T) {
 	})
 
 	t.Run("JSON found in S3 bucket and updated", func(t *testing.T) {
-		// TODO: this test is failing with an unmarshal error
 		existingJSON := `[{"maps_options":[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"}], "bounds": 2}]`
 		expectedJSON := `[{"maps_options":[{"display_name":"Jan 2023","url":"mapbox://existing-tileset","key":"Daily-UkraineAnd_2023-1-1"},{"display_name":"Feb 2023","url":"mapbox://test-tileset","key":"Daily-UkraineAnd_2023-2-1"}], "bounds": 2}]`
 

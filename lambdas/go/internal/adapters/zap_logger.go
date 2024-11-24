@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"context"
+
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
 	"github.com/BaronBonet/conflict-nightlight/internal/infrastructure"
 	"go.uber.org/zap"

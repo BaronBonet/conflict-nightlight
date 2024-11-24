@@ -23,8 +23,8 @@ import (
 
 type mapBoxTileServerRepo struct {
 	logger    ports.Logger
-	secrets   mapboxSecrets
 	awsClient awsclient.AWSClient
+	secrets   mapboxSecrets
 }
 
 type mapboxSecrets struct {
