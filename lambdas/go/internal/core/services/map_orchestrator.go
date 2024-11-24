@@ -3,11 +3,12 @@ package services
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 	"github.com/BaronBonet/conflict-nightlight/internal/core/ports"
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/exp/slices"
-	"time"
 )
 
 type service struct {
@@ -19,7 +20,14 @@ type service struct {
 	mapTileServerRepo        ports.MapTileServerRepo
 }
 
-func NewOrchestratorService(logger ports.Logger, externalMapsRepo ports.ExternalMapProviderRepo, rawInternalMapRepo ports.InternalMapRepo, processedInternalMapRepo ports.InternalMapRepo, frontendMapDataRepo ports.FrontendMapDataRepo, mapTileServerRepo ports.MapTileServerRepo) ports.OrchestratorService {
+func NewOrchestratorService(
+	logger ports.Logger,
+	externalMapsRepo ports.ExternalMapProviderRepo,
+	rawInternalMapRepo ports.InternalMapRepo,
+	processedInternalMapRepo ports.InternalMapRepo,
+	frontendMapDataRepo ports.FrontendMapDataRepo,
+	mapTileServerRepo ports.MapTileServerRepo,
+) ports.OrchestratorService {
 	return &service{
 		logger:                   logger,
 		externalMapsRepo:         externalMapsRepo,
@@ -46,11 +54,21 @@ func (srv *service) SyncInternalWithExternalMaps(ctx context.Context, request do
 }
 
 func (srv *service) ListRawInternalMaps(ctx context.Context) ([]domain.Map, error) {
-	return srv.rawInternalMapRepo.List(ctx, srv.externalMapsRepo.GetProvider(), domain.BoundsUnspecified, domain.MapTypeUnspecified)
+	return srv.rawInternalMapRepo.List(
+		ctx,
+		srv.externalMapsRepo.GetProvider(),
+		domain.BoundsUnspecified,
+		domain.MapTypeUnspecified,
+	)
 }
 
 func (srv *service) ListProcessedInternalMaps(ctx context.Context) ([]domain.Map, error) {
-	return srv.processedInternalMapRepo.List(ctx, domain.MapProviderUnspecified, domain.BoundsUnspecified, domain.MapTypeUnspecified)
+	return srv.processedInternalMapRepo.List(
+		ctx,
+		domain.MapProviderUnspecified,
+		domain.BoundsUnspecified,
+		domain.MapTypeUnspecified,
+	)
 }
 
 func (srv *service) ListPublishedMaps(ctx context.Context) ([]domain.PublishedMap, error) {
@@ -107,7 +125,12 @@ func (srv *service) DeleteMap(ctx context.Context, m domain.Map) {
 	}
 }
 
-func (srv *service) findNewMaps(ctx context.Context, cropper domain.Bounds, mapType domain.MapType, selectedDates domain.SelectedDates) ([]domain.Map, error) {
+func (srv *service) findNewMaps(
+	ctx context.Context,
+	cropper domain.Bounds,
+	mapType domain.MapType,
+	selectedDates domain.SelectedDates,
+) ([]domain.Map, error) {
 	validate := validator.New()
 	if err := validate.Struct(selectedDates); err != nil {
 		return nil, errors.New("the selected dates were not valid")
@@ -127,7 +150,9 @@ func (srv *service) findNewMaps(ctx context.Context, cropper domain.Bounds, mapT
 
 	var newMaps []domain.Map
 	for _, sourceMap := range sourceMaps {
-		if slices.Contains(selectedDates.Months, time.Month(sourceMap.Date.Month)) && slices.Contains(selectedDates.Years, sourceMap.Date.Year) && !slices.Contains(internalMaps, sourceMap) {
+		if slices.Contains(selectedDates.Months, time.Month(sourceMap.Date.Month)) &&
+			slices.Contains(selectedDates.Years, sourceMap.Date.Year) &&
+			!slices.Contains(internalMaps, sourceMap) {
 			srv.logger.Debug(ctx, "Found a map we do not have in our internal repo", "sourceMap", sourceMap)
 			newMaps = append(newMaps, sourceMap)
 		}

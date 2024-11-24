@@ -3,8 +3,7 @@ package domain
 import (
 	"testing"
 
-	// TODO: Can't we use the standard library?
-	"github.com/go-playground/assert/v2"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStringToBounds(t *testing.T) {

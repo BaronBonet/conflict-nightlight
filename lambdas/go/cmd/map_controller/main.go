@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+
 	"github.com/BaronBonet/conflict-nightlight/internal/adapters"
 	"github.com/BaronBonet/conflict-nightlight/internal/adapters/awsclient"
 	"github.com/BaronBonet/conflict-nightlight/internal/adapters/externalmapsrepo"
@@ -32,15 +33,41 @@ func main() {
 		logger,
 		infrastructure.GetEnvOrDefault("RAW_TIF_BUCKET", "conflict-nightlight-raw-tif"),
 		infrastructure.GetEnvOrDefault("SOURCE_URL_KEY", "source-url"),
-		infrastructure.GetEnvOrDefault("DOWNLOAD_RAW_TIF_QUEUE", "conflict-nightlight-download-and-crop-raw-tif-request"),
+		infrastructure.GetEnvOrDefault(
+			"DOWNLOAD_RAW_TIF_QUEUE",
+			"conflict-nightlight-download-and-crop-raw-tif-request",
+		),
 		writeDir,
 		awsClient,
 	)
 	// TODO when create is implemented to the internal maps repo, add the persist request queue
-	internalProcessedMapsRepo := internalmapsrepo.NewAWSInternalMapsRepository(logger, infrastructure.GetEnvOrDefault("PROCESSED_TIF_BUCKET_NAME", "conflict-nightlight-processed-tif"), infrastructure.GetEnvOrDefault("SOURCE_KEY_URL", "source-url"), "", infrastructure.GetEnvOrDefault("WRITE_DIR", "/tmp"), awsClient)
-	frontendMapDataRepo := frontendmapdatarepo.NewS3FrontendMapDataRepo(ctx, logger, infrastructure.GetEnvOrDefault("CDN_BUCKET_NAME", "conflict-nightlight-cdn"), infrastructure.GetEnvOrDefault("FRONTEND_MAP_OPTIONS_JSON", "conflict-nightlight-map-options.json"))
-	mapboxTileServerRepo := maptileserverrepo.NewMapboxTileServerRepo(ctx, logger, infrastructure.GetEnvOrDefault("CONFLICT_NIGHTLIGHT_SECRETS_KEY", "conflict-nightlight-secrets"))
-	service := services.NewOrchestratorService(logger, externalMapsRepo, internalRawMapsRepo, internalProcessedMapsRepo, frontendMapDataRepo, mapboxTileServerRepo)
+	internalProcessedMapsRepo := internalmapsrepo.NewAWSInternalMapsRepository(
+		logger,
+		infrastructure.GetEnvOrDefault("PROCESSED_TIF_BUCKET_NAME", "conflict-nightlight-processed-tif"),
+		infrastructure.GetEnvOrDefault("SOURCE_KEY_URL", "source-url"),
+		"",
+		infrastructure.GetEnvOrDefault("WRITE_DIR", "/tmp"),
+		awsClient,
+	)
+	frontendMapDataRepo := frontendmapdatarepo.NewS3FrontendMapDataRepo(
+		ctx,
+		logger,
+		infrastructure.GetEnvOrDefault("CDN_BUCKET_NAME", "conflict-nightlight-cdn"),
+		infrastructure.GetEnvOrDefault("FRONTEND_MAP_OPTIONS_JSON", "conflict-nightlight-map-options.json"),
+	)
+	mapboxTileServerRepo := maptileserverrepo.NewMapboxTileServerRepo(
+		ctx,
+		logger,
+		infrastructure.GetEnvOrDefault("CONFLICT_NIGHTLIGHT_SECRETS_KEY", "conflict-nightlight-secrets"),
+	)
+	service := services.NewOrchestratorService(
+		logger,
+		externalMapsRepo,
+		internalRawMapsRepo,
+		internalProcessedMapsRepo,
+		frontendMapDataRepo,
+		mapboxTileServerRepo,
+	)
 	lambdaHandler := handlers.NewMapControllerLambdaHandler(logger, service)
 	lambda.Start(lambdaHandler.HandleEvent)
 }

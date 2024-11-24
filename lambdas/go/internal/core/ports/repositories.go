@@ -2,6 +2,7 @@ package ports
 
 import (
 	"context"
+
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 )
 
@@ -13,9 +14,14 @@ type ExternalMapProviderRepo interface {
 
 // InternalMapRepo is an interface for interacting with the internal maps we have
 type InternalMapRepo interface {
-	List(ctx context.Context, provider domain.MapProvider, bounds domain.Bounds, mapType domain.MapType) ([]domain.Map, error)
+	List(
+		ctx context.Context,
+		provider domain.MapProvider,
+		bounds domain.Bounds,
+		mapType domain.MapType,
+	) ([]domain.Map, error)
 	// Create does not work with the processedInternalRepository implementation of the InternalMapRepo
-	//  TODO make it work
+  //  TODO: make it work
 	Create(ctx context.Context, m domain.Map) error
 	Download(ctx context.Context, m domain.Map) (*domain.LocalMap, error)
 	Delete(ctx context.Context, m domain.Map) error

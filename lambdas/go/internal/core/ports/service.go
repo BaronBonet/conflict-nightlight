@@ -2,6 +2,7 @@ package ports
 
 import (
 	"context"
+
 	"github.com/BaronBonet/conflict-nightlight/internal/core/domain"
 )
 

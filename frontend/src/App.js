@@ -35,7 +35,7 @@ let locationOptions = [
   },
   {
     boundsProtoId: 2,
-    label: "Palistinine Genocide",
+    label: "Israeli Invasion of Gaza",
     configuration: {
       zoom: { max: 9, min: 5, default: 8.0 },
       bounds: [
