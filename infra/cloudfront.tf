@@ -9,6 +9,8 @@ resource "aws_cloudfront_origin_access_identity" "frontend_s3_distribution" {
 
 
 resource "aws_cloudfront_distribution" "frontend_distribution" {
+  depends_on = [aws_acm_certificate_validation.conflictnightlight_com]
+
   origin {
     domain_name = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
     origin_id   = local.s3_frontend_origin_id
@@ -74,6 +76,8 @@ resource "aws_cloudfront_origin_access_identity" "cdn_s3_distribution" {
 }
 
 resource "aws_cloudfront_distribution" "cdn_distribution" {
+  depends_on = [aws_acm_certificate_validation.conflictnightlight_cdn]
+
   origin {
     domain_name = aws_s3_bucket.cdn.bucket_regional_domain_name
     origin_id   = local.s3_cdn_origin_id

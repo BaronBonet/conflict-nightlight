@@ -95,7 +95,25 @@ variable "frontend_bucket_name" {
 variable "domain_name" {
   description = "The domain name where the frontend will be hosted"
   type        = string
-  default     = "conflictnightlight.com"
+  default     = "conflict-nightlight.ericcbonet.com"
+}
+
+variable "hosted_zone_name" {
+  description = "The Route53 hosted zone that contains the frontend domain"
+  type        = string
+  default     = "ericcbonet.com"
+}
+
+variable "github_repository" {
+  description = "GitHub repository allowed to assume the deploy role"
+  type        = string
+  default     = "BaronBonet/conflict-nightlight"
+}
+
+variable "github_deploy_branch" {
+  description = "GitHub branch allowed to assume the deploy role"
+  type        = string
+  default     = "main"
 }
 
 variable "cdn_bucket_name" {
