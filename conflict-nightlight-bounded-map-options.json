@@ -1,0 +1,804 @@
+[
+  {
+    "maps_options": [
+      {
+        "display_name": "Jan 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-1-1",
+        "key": "Monthly-GazaAndAro_2023-1-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202301/vcmcfg/SVDNB_npp_20230101-20230131_75N060W_vcmcfg_v10_c202302080600.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Feb 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-2-1",
+        "key": "Monthly-GazaAndAro_2023-2-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 2,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202302/vcmcfg/SVDNB_npp_20230201-20230228_75N060W_vcmcfg_v10_c202303060900.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Mar 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-3-1",
+        "key": "Monthly-GazaAndAro_2023-3-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 3,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202303/vcmcfg/SVDNB_npp_20230301-20230331_75N060W_vcmcfg_v10_c202304101100.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Apr 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-4-1",
+        "key": "Monthly-GazaAndAro_2023-4-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 4,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202304/vcmcfg/SVDNB_npp_20230401-20230430_75N060W_vcmcfg_v10_c202305081600.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "May 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-5-1",
+        "key": "Monthly-GazaAndAro_2023-5-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 5,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202305/vcmcfg/SVDNB_npp_20230501-20230531_75N060W_vcmcfg_v10_c202306121300.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Jun 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-6-1",
+        "key": "Monthly-GazaAndAro_2023-6-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 6,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202306/vcmcfg/SVDNB_npp_20230601-20230630_75N060W_vcmcfg_v10_c202307071000.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Jul 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-7-1",
+        "key": "Monthly-GazaAndAro_2023-7-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 7,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202307/vcmcfg/SVDNB_npp_20230701-20230726_75N060W_vcmcfg_v10_c202308111200.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Aug 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-8-1",
+        "key": "Monthly-GazaAndAro_2023-8-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 8,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202308/vcmcfg/SVDNB_npp_20230801-20230831_75N060W_vcmcfg_v10_c202309131200.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Sep 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-9-1",
+        "key": "Monthly-GazaAndAro_2023-9-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 9,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202309/vcmcfg/SVDNB_npp_20230901-20230930_75N060W_vcmcfg_v10_c202310101000.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Oct 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-10-1",
+        "key": "Monthly-GazaAndAro_2023-10-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 10,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202310/vcmcfg/SVDNB_npp_20231001-20231031_75N060W_vcmcfg_v10_c202311081400.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Nov 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-11-1",
+        "key": "Monthly-GazaAndAro_2023-11-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 11,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202311/vcmcfg/SVDNB_npp_20231101-20231130_75N060W_vcmcfg_v10_c202312080900.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Dec 2023",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2023-12-1",
+        "key": "Monthly-GazaAndAro_2023-12-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 12,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202312/vcmcfg/SVDNB_npp_20231201-20231231_75N060W_vcmcfg_v10_c202401181200.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Jan 2024",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2024-1-1",
+        "key": "Monthly-GazaAndAro_2024-1-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2024
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2024/202401/vcmcfg/SVDNB_npp_20240101-20240131_75N060W_vcmcfg_v10_c202402062300.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Feb 2024",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2024-2-1",
+        "key": "Monthly-GazaAndAro_2024-2-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 2,
+            "year": 2024
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2024/202402/vcmcfg/SVDNB_npp_20240201-20240229_75N060W_vcmcfg_v10_c202403141100.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Mar 2024",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2024-3-1",
+        "key": "Monthly-GazaAndAro_2024-3-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 3,
+            "year": 2024
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2024/202403/vcmcfg/SVDNB_npp_20240301-20240331_75N060W_vcmcfg_v10_c202404121500.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Apr 2024",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2024-4-1",
+        "key": "Monthly-GazaAndAro_2024-4-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 4,
+            "year": 2024
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2024/202404/vcmcfg/SVDNB_npp_20240401-20240430_75N060W_vcmcfg_v10_c202405080700.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "May 2024",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2024-5-1",
+        "key": "Monthly-GazaAndAro_2024-5-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 5,
+            "year": 2024
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2024/202405/vcmcfg/SVDNB_npp_20240501-20240528_75N060W_vcmcfg_v10_c202406122300.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Jun 2024",
+        "url": "mapbox://ericcbonet.Monthly-GazaAndAro_2024-6-1",
+        "key": "Monthly-GazaAndAro_2024-6-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 6,
+            "year": 2024
+          },
+          "map_type": 2,
+          "bounds": 2,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2024/202406/vcmcfg/SVDNB_npp_20240604-20240630_75N060W_vcmcfg_v10_c202407161300.tgz"
+          }
+        }
+      }
+    ],
+    "bounds": 2
+  },
+  {
+    "maps_options": [
+      {
+        "display_name": "Jan 2021",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2021-1-1",
+        "key": "Monthly-UkraineAnd_2021-1-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2021
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2021/202101/vcmcfg/SVDNB_npp_20210101-20210131_75N060W_vcmcfg_v10_c202102062300.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Feb 2021",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2021-2-1",
+        "key": "Monthly-UkraineAnd_2021-2-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 2,
+            "year": 2021
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2021/202102/vcmcfg/SVDNB_npp_20210201-20210228_75N060W_vcmcfg_v10_c202103091200.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Mar 2021",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2021-3-1",
+        "key": "Monthly-UkraineAnd_2021-3-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 3,
+            "year": 2021
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2021/202103/vcmcfg/SVDNB_npp_20210301-20210331_75N060W_vcmcfg_v10_c202104061200.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Apr 2021",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2021-4-1",
+        "key": "Monthly-UkraineAnd_2021-4-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 4,
+            "year": 2021
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2021/202104/vcmcfg/SVDNB_npp_20210401-20210430_75N060W_vcmcfg_v10_c202105062200.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Oct 2021",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2021-10-1",
+        "key": "Monthly-UkraineAnd_2021-10-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 10,
+            "year": 2021
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2021/202110/vcmcfg/SVDNB_npp_20211001-20211031_75N060W_vcmcfg_v10_c202111062300.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Nov 2021",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2021-11-1",
+        "key": "Monthly-UkraineAnd_2021-11-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 11,
+            "year": 2021
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2021/202111/vcmcfg/SVDNB_npp_20211101-20211130_75N060W_vcmcfg_v10_c202112060900.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Dec 2021",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2021-12-1",
+        "key": "Monthly-UkraineAnd_2021-12-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 12,
+            "year": 2021
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2021/202112/vcmcfg/SVDNB_npp_20211201-20211231_75N060W_vcmcfg_v10_c202201100700.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Jan 2022",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2022-1-1",
+        "key": "Monthly-UkraineAnd_2022-1-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2022
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2022/202201/vcmcfg/SVDNB_npp_20220101-20220131_75N060W_vcmcfg_v10_c202202041600.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Feb 2022",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2022-2-1",
+        "key": "Monthly-UkraineAnd_2022-2-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 2,
+            "year": 2022
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2022/202202/vcmcfg/SVDNB_npp_20220201-20220228_75N060W_vcmcfg_v10_c202203052300.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Mar 2022",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2022-3-1",
+        "key": "Monthly-UkraineAnd_2022-3-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 3,
+            "year": 2022
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2022/202203/vcmcfg/SVDNB_npp_20220301-20220331_75N060W_vcmcfg_v10_c202204080900.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Apr 2022",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2022-4-1",
+        "key": "Monthly-UkraineAnd_2022-4-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 4,
+            "year": 2022
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2022/202204/vcmcfg/SVDNB_npp_20220401-20220430_75N060W_vcmcfg_v10_c202205051100.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Oct 2022",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2022-10-1",
+        "key": "Monthly-UkraineAnd_2022-10-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 10,
+            "year": 2022
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2022/202210/vcmcfg/SVDNB_npp_20221001-20221031_75N060W_vcmcfg_v10_c202211081400.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Nov 2022",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2022-11-1",
+        "key": "Monthly-UkraineAnd_2022-11-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 11,
+            "year": 2022
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2022/202211/vcmcfg/SVDNB_npp_20221101-20221130_75N060W_vcmcfg_v10_c202212131200.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Dec 2022",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2022-12-1",
+        "key": "Monthly-UkraineAnd_2022-12-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 12,
+            "year": 2022
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2022/202212/vcmcfg/SVDNB_npp_20221201-20221231_75N060W_vcmcfg_v10_c202301111000.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Jan 2023",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2023-1-1",
+        "key": "Monthly-UkraineAnd_2023-1-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202301/vcmcfg/SVDNB_npp_20230101-20230131_75N060W_vcmcfg_v10_c202302080600.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Feb 2023",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2023-2-1",
+        "key": "Monthly-UkraineAnd_2023-2-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 2,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202302/vcmcfg/SVDNB_npp_20230201-20230228_75N060W_vcmcfg_v10_c202303060900.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Mar 2023",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2023-3-1",
+        "key": "Monthly-UkraineAnd_2023-3-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 3,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202303/vcmcfg/SVDNB_npp_20230301-20230331_75N060W_vcmcfg_v10_c202304101100.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Apr 2023",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2023-4-1",
+        "key": "Monthly-UkraineAnd_2023-4-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 4,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202304/vcmcfg/SVDNB_npp_20230401-20230430_75N060W_vcmcfg_v10_c202305081600.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Sep 2023",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2023-9-1",
+        "key": "Monthly-UkraineAnd_2023-9-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 9,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202309/vcmcfg/SVDNB_npp_20230901-20230930_75N060W_vcmcfg_v10_c202310101000.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Oct 2023",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2023-10-1",
+        "key": "Monthly-UkraineAnd_2023-10-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 10,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202310/vcmcfg/SVDNB_npp_20231001-20231031_75N060W_vcmcfg_v10_c202311081400.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Nov 2023",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2023-11-1",
+        "key": "Monthly-UkraineAnd_2023-11-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 11,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202311/vcmcfg/SVDNB_npp_20231101-20231130_75N060W_vcmcfg_v10_c202312080900.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Dec 2023",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2023-12-1",
+        "key": "Monthly-UkraineAnd_2023-12-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 12,
+            "year": 2023
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2023/202312/vcmcfg/SVDNB_npp_20231201-20231231_75N060W_vcmcfg_v10_c202401181200.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Jan 2024",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2024-1-1",
+        "key": "Monthly-UkraineAnd_2024-1-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 1,
+            "year": 2024
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2024/202401/vcmcfg/SVDNB_npp_20240101-20240131_75N060W_vcmcfg_v10_c202402062300.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Feb 2024",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2024-2-1",
+        "key": "Monthly-UkraineAnd_2024-2-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 2,
+            "year": 2024
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2024/202402/vcmcfg/SVDNB_npp_20240201-20240229_75N060W_vcmcfg_v10_c202403141100.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Mar 2024",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2024-3-1",
+        "key": "Monthly-UkraineAnd_2024-3-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 3,
+            "year": 2024
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2024/202403/vcmcfg/SVDNB_npp_20240301-20240331_75N060W_vcmcfg_v10_c202404121500.tgz"
+          }
+        }
+      },
+      {
+        "display_name": "Apr 2024",
+        "url": "mapbox://ericcbonet.Monthly-UkraineAnd_2024-4-1",
+        "key": "Monthly-UkraineAnd_2024-4-1",
+        "map": {
+          "date": {
+            "day": 1,
+            "month": 4,
+            "year": 2024
+          },
+          "map_type": 2,
+          "bounds": 1,
+          "map_source": {
+            "map_provider": 1,
+            "url": "https://eogdata.mines.edu/nighttime_light/monthly/v10/2024/202404/vcmcfg/SVDNB_npp_20240401-20240430_75N060W_vcmcfg_v10_c202405080700.tgz"
+          }
+        }
+      }
+    ],
+    "bounds": 1
+  }
+]

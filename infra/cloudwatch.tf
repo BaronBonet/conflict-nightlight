@@ -75,7 +75,8 @@ resource "aws_cloudwatch_event_target" "lambda_target_gaza" {
       4,
       5,
       6,
-      7,
+      # TODO: figure out what is wrong with July 2024
+      # 7,
       8,
       9,
       10,

@@ -72,6 +72,10 @@ resource "aws_lambda_function" "conflict_nightlight_python_lambda_function" {
   image_uri     = "${aws_ecr_repository.conflict_nightlight_python_lambda_repo.repository_url}:latest"
   package_type  = "Image"
   publish       = true
+
+  lifecycle {
+    ignore_changes = [image_uri]
+  }
 }
 
 resource "aws_lambda_event_source_mapping" "conflict_nightlight_raw_tif_downloader_lambda_event_source" {

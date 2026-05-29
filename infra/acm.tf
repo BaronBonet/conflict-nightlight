@@ -18,7 +18,7 @@ resource "aws_acm_certificate" "conflictnightlight_com" {
 }
 
 data "aws_route53_zone" "conflictnightlight_com" {
-  name         = var.domain_name
+  name         = var.hosted_zone_name
   private_zone = false
 }
 

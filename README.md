@@ -2,6 +2,8 @@
 
 A full stack application for downloading, processing and displaying nightlight data.
 
+Production is hosted at <https://conflict-nightlight.ericcbonet.com>.
+
 
 ## About
 
