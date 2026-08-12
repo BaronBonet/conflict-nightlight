@@ -79,7 +79,7 @@ function App() {
     const fetchMapOptions = async () => {
       try {
         const response = await fetch(
-          "https://cdn.conflict-nightlight.ericcbonet.com/conflict-nightlight-bounded-map-options.json",
+          "https://cdn.conflictnightlight.ericcbonet.com/conflict-nightlight-bounded-map-options.json",
         );
         const fetchedMapOptions = await response.json();
         setAllMapOptions(fetchedMapOptions);

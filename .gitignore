@@ -1,6 +1,5 @@
 .idea/
 .terraform
-.terraform.lock.hcl
 mocks
 mock_*
 map-controller
@@ -43,3 +42,4 @@ debugger
 lambdas/go/.local/bin/*
 !lambdas/go/.local/bin/.gitkeep
 .op
+!/.tool-versions
