@@ -29,12 +29,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v3
-
     - name: Install dependencies
       shell: bash
       working-directory: frontend
-      run: yarn install
+      run: yarn install --frozen-lockfile
 
     - name: Build app
       shell: bash
@@ -48,14 +46,26 @@ runs:
         role-to-assume: ${{ inputs.aws-role-to-assume }}
         aws-region: eu-central-1
 
-    - name: Push to S3
+    - name: Sync to S3
       working-directory: frontend
       shell: bash
       if: ${{ inputs.deploy == 'true' }}
-      run: aws s3 cp build s3://${{ inputs.s3-bucket-name }}/ --recursive
+      run: aws s3 sync build s3://${{ inputs.s3-bucket-name }}/ --delete
 
-    - name: Invalidate Cloudfront Cache
+    - name: Invalidate CloudFront cache
       if: ${{ inputs.deploy == 'true' }}
       shell: bash
       working-directory: frontend
-      run: aws cloudfront create-invalidation --distribution-id $(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[0]=='${{ inputs.domain-name }}'].Id | [0]" --output text) --paths "/*"
+      run: |
+        distribution_id=$(aws cloudfront list-distributions \
+          --query "DistributionList.Items[?Aliases.Items != null && contains(Aliases.Items, '${{ inputs.domain-name }}')].Id | [0]" \
+          --output text)
+
+        if [[ -z "${distribution_id}" || "${distribution_id}" == "None" ]]; then
+          echo "Could not find a CloudFront distribution for ${{ inputs.domain-name }}" >&2
+          exit 1
+        fi
+
+        aws cloudfront create-invalidation \
+          --distribution-id "${distribution_id}" \
+          --paths "/*"

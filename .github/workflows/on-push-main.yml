@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+concurrency:
+  group: production
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -22,38 +27,8 @@ jobs:
       - id: set-image-tag
         run: echo "image-tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-  go-zip-builder-and-deployer:
-    name: Build and deploy go zip
-    runs-on: ubuntu-latest
-    needs:
-      - image-tag
-    strategy:
-      matrix:
-        name: [ map_controller, map_publisher ]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/build-deploy-go
-        with:
-          name: ${{ matrix.name }}
-          zip-tag: ${{ needs.image-tag.outputs.image-tag }}
-          deploy: true
-          aws-role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-
-  python-image-builder-and-deployer:
-    name: Build and deploy python docker
-    runs-on: ubuntu-latest
-    needs:
-      - image-tag
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/build-deploy-docker-image
-        with:
-          deploy: true
-          image-tag: ${{ needs.image-tag.outputs.image-tag }}
-          aws-role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-
-  react-image-builder-and-deployer:
-    name: Build and push react to S3
+  deploy-frontend:
+    name: Build and deploy frontend
     runs-on: ubuntu-latest
     needs:
       - image-tag
