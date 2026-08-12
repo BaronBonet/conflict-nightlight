@@ -95,7 +95,7 @@ variable "frontend_bucket_name" {
 variable "domain_name" {
   description = "The domain name where the frontend will be hosted"
   type        = string
-  default     = "conflict-nightlight.ericcbonet.com"
+  default     = "conflictnightlight.ericcbonet.com"
 }
 
 variable "hosted_zone_name" {

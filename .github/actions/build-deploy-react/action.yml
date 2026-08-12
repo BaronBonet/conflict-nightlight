@@ -24,7 +24,7 @@ inputs:
     default: conflict-nightlight-frontend
   domain-name:
     required: false
-    default: conflict-nightlight.ericcbonet.com
+    default: conflictnightlight.ericcbonet.com
 
 runs:
   using: composite
